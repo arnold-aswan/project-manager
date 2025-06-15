@@ -15,8 +15,10 @@ import { Button } from "@/components/ui/button";
 import { FormField } from "@/components/shared/formfield";
 import { Link } from "react-router";
 import { signUpSchema } from "@/lib/schema";
+import { useSignUpMutation } from "@/hooks/useAuth";
+import { toast } from "sonner";
 
-type SignUpFormData = z.infer<typeof signUpSchema>;
+export type SignUpFormData = z.infer<typeof signUpSchema>;
 
 const SignUp = () => {
 	const form = useForm<SignUpFormData>({
@@ -29,9 +31,25 @@ const SignUp = () => {
 		},
 	});
 
+	const { mutate, isPending } = useSignUpMutation();
+
 	const handleSubmit = (data: SignUpFormData) => {
 		console.log(data);
+		mutate(data, {
+			onSuccess: () => {
+				toast.success("Account created successfully!");
+			},
+			onError: (error: any) => {
+				const errorMsg = error.response?.data?.message || "An error occurred";
+				toast.error(errorMsg);
+				console.error("Sign up error:", error);
+			},
+			// onSettled: () => {
+			// 	form.reset();
+			// },
+		});
 	};
+
 	return (
 		<section className="min-h-screen flex flex-col items-center justify-center bg-muted/40 p-4 ">
 			<Card className="max-w-md w-full shadow-xl">
