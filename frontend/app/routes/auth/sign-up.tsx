@@ -13,7 +13,7 @@ import {
 import { Form } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { FormField } from "@/components/shared/formfield";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { signUpSchema } from "@/lib/schema";
 import { useSignUpMutation } from "@/hooks/useAuth";
 import { toast } from "sonner";
@@ -21,6 +21,7 @@ import { toast } from "sonner";
 export type SignUpFormData = z.infer<typeof signUpSchema>;
 
 const SignUp = () => {
+	const navigate = useNavigate();
 	const form = useForm<SignUpFormData>({
 		resolver: zodResolver(signUpSchema),
 		defaultValues: {
@@ -37,16 +38,21 @@ const SignUp = () => {
 		console.log(data);
 		mutate(data, {
 			onSuccess: () => {
-				toast.success("Account created successfully!");
+				toast.success("Email verification required", {
+					description:
+						"A verification email was sent to your email. Please check and verify your account.",
+				});
+				form.reset();
+				navigate("/sign-in");
 			},
 			onError: (error: any) => {
-				const errorMsg = error.response?.data?.message || "An error occurred";
+				const errorMsg =
+					error.response?.data?.message ||
+					error.response?.data?.error ||
+					"An error occurred";
 				toast.error(errorMsg);
 				console.error("Sign up error:", error);
 			},
-			// onSettled: () => {
-			// 	form.reset();
-			// },
 		});
 	};
 
@@ -92,8 +98,9 @@ const SignUp = () => {
 							<Button
 								type="submit"
 								className="w-full"
+								disabled={isPending}
 							>
-								Sign Up
+								{isPending ? "Signing Up..." : "Sign Up"}
 							</Button>
 						</form>
 					</Form>
