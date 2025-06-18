@@ -4,8 +4,9 @@ import arcjet, {
 	tokenBucket,
 	validateEmail,
 } from "@arcjet/node";
+import dotenv from "dotenv";
 
-console.log("arcjet key::", process.env.ARCJET_KEY);
+dotenv.config();
 
 // Arcjet middleware for bot detection and rate limiting
 const aj = arcjet({

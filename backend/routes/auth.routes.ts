@@ -10,7 +10,6 @@ import {
 	registerUser,
 	verifyEmailHandler,
 } from "../controllers/auth.controller";
-import { verify } from "crypto";
 
 const router = express.Router();
 
