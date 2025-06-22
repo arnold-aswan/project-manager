@@ -14,11 +14,17 @@ import {
 import { Form } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { FormField } from "@/components/shared/formfield";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
+import { useLoginMutation } from "@/hooks/useAuth";
+import { toast } from "sonner";
+import { Loader2 } from "@/assets/icons";
+import useAuthStore from "@/stores/authstore";
+import type { User } from "@/types";
 
-type SignInFormData = z.infer<typeof signInSchema>;
+export type SignInFormData = z.infer<typeof signInSchema>;
 
 const SignIn = () => {
+	const navigate = useNavigate();
 	const form = useForm<SignInFormData>({
 		resolver: zodResolver(signInSchema),
 		defaultValues: {
@@ -27,8 +33,26 @@ const SignIn = () => {
 		},
 	});
 
+	const { mutate, isPending } = useLoginMutation();
+	const { loginSuccess } = useAuthStore.getState();
+
 	const handleSubmit = (data: SignInFormData) => {
 		console.log(data);
+		mutate(data, {
+			onSuccess: (data) => {
+				const userData = data as { user: User };
+				loginSuccess(userData.user);
+				toast.success("logged in successfully");
+				navigate("/dashboard");
+			},
+			onError: (error: any) => {
+				const errorMsg =
+					error.response?.data?.message ||
+					error.response?.data?.error ||
+					"An error occurred";
+				toast.error(errorMsg);
+			},
+		});
 	};
 
 	return (
@@ -58,11 +82,26 @@ const SignIn = () => {
 								type="password"
 								placeholder="••••••••"
 							/>
+
+							<Link
+								to="/forgot-password"
+								className="text-blue-500 text-xs hover:underline block "
+							>
+								Forgot password?
+							</Link>
 							<Button
 								type="submit"
 								className="w-full"
+								disabled={isPending}
 							>
-								Sign In
+								{isPending ? (
+									<>
+										<Loader2 className="size-4 mr-2" />
+										Signing in...
+									</>
+								) : (
+									"Sign In"
+								)}
 							</Button>
 						</form>
 					</Form>

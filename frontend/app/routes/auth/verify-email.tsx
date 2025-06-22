@@ -2,12 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Link, useSearchParams } from "react-router";
 
-import {
-	ArrowLeft,
-	CheckCircle,
-	Loader2,
-	XCircle,
-} from "../../../public/icons";
+import { ArrowLeft, CheckCircle, Loader2, XCircle } from "@/assets/icons";
 import { Button } from "@/components/ui/button";
 import { useVerifyEmailMutation } from "@/hooks/useAuth";
 import { toast } from "sonner";
@@ -58,7 +53,7 @@ const VerifyEmail = () => {
 							<>
 								<CheckCircle className="size-10 text-green-500" />
 								<h3 className="text-2xl font-bold">Email Verified</h3>
-								<p className="text-sm text-gray-50s0">
+								<p className="text-sm text-muted-foreground">
 									Your email was verified successfully.
 								</p>
 								<Link
@@ -80,7 +75,7 @@ const VerifyEmail = () => {
 								<h3 className="text-2xl font-bold">
 									Email Verification Failed!
 								</h3>
-								<p className="text-sm text-gray-50z0">
+								<p className="text-sm text-muted-foreground">
 									Email verification failed. Please try again later.
 								</p>
 
