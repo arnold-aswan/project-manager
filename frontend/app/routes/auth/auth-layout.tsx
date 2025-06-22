@@ -1,14 +1,12 @@
-import useAuthStore from "@/stores/authstore";
-import { Navigate, Outlet } from "react-router";
+import { Outlet } from "react-router";
+import { PublicRoute } from "@/components/auth/auth-wrapper";
 
 const AuthLayout = () => {
-	const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
-
-	if (isAuthenticated) {
-		return <Navigate to="/dashboard" />;
-	}
-
-	return <Outlet />;
+	return (
+		<PublicRoute>
+			<Outlet />
+		</PublicRoute>
+	);
 };
 
 export default AuthLayout;
