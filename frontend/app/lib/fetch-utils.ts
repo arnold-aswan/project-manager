@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
-console.log(`API Base URL: ${BASE_URL}`);
+// console.log(`API Base URL: ${BASE_URL}`);
 
 const api = axios.create({
 	baseURL: BASE_URL,
@@ -16,20 +16,25 @@ const api = axios.create({
 api.interceptors.response.use(
 	(response) => response,
 	(error) => {
-		if (error.response && error.response.status === 401) {
-			// Handle unauthorized access
+		const isUnauthorized = error.response?.status === 401;
+		const requestUrl = error.config?.url || "";
+
+		// Skip redirect if the error came from a reset-password request
+		const isResetPasswordRoute = requestUrl.includes("/reset-password");
+
+		if (isUnauthorized && !isResetPasswordRoute) {
 			console.error("Unauthorized access - redirecting to login");
-			window.location.href = "/login"; // Adjust the path as needed
+			window.location.href = `${process.env.VITE_API_BASE_URL}/sign-in`;
 		} else {
 			console.error("API error:", error);
 		}
+
 		return Promise.reject(error);
 	}
 );
 
 const postData = async <T>(url: string, data: unknown): Promise<T> => {
 	const response = await api.post(url, data);
-	console.log(url);
 	return response.data;
 };
 
