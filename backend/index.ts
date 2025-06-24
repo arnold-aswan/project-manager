@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import mongoose from "mongoose";
 import cors from "cors";
 import morgan from "morgan";
+import cookieParser from "cookie-parser";
 
 import routes from "./routes/index";
 
@@ -13,7 +14,7 @@ const PORT = process.env.PORT || 5000;
 app.use(
 	cors({
 		origin: process.env.FRONTEND_URL,
-		allowedHeaders: ["Content-Type", "Authorization"],
+		allowedHeaders: ["Content-Type", "Authorization", "Cookie"],
 		methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
 		credentials: true, // Allow cookies to be sent with requests
 	})
@@ -21,6 +22,7 @@ app.use(
 app.use(express.json());
 app.use(morgan("dev")); // Logging middleware
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 // MongoDB connection
 mongoose
