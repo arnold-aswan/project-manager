@@ -1,17 +1,15 @@
 import axios from "axios";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
-// console.log(`API Base URL: ${BASE_URL}`);
+console.log(`API Base URL: ${BASE_URL}`);
 
 const api = axios.create({
-	baseURL: BASE_URL,
+	baseURL: "http://localhost:5000/api-v1",
 	withCredentials: true, // Enable cookies for cross-origin requests
 	headers: {
 		"Content-Type": "application/json",
 	},
 });
-
-// api.interceptors.request.use((config) => {});
 
 api.interceptors.response.use(
 	(response) => response,
@@ -24,7 +22,10 @@ api.interceptors.response.use(
 
 		if (isUnauthorized && !isResetPasswordRoute) {
 			console.error("Unauthorized access - redirecting to login");
-			window.location.href = `${process.env.VITE_API_BASE_URL}/sign-in`;
+			// Use environment variable properly for frontend
+			const frontendUrl =
+				import.meta.env.VITE_FRONTEND_URL || "http://localhost:5173";
+			// window.location.href = `${frontendUrl}/sign-in`;
 		} else {
 			console.error("API error:", error);
 		}
