@@ -158,13 +158,12 @@ const loginUser = async (req: Request, res: Response) => {
 					return;
 				} else {
 					console.log("Verification email sent");
+					res.status(201).json({
+						message:
+							"A verification email was sent to your email. Please check and verify your account.",
+					});
 					return;
 				}
-
-				res.status(201).json({
-					message:
-						"A verification email was sent to your email. Please check and verify your account.",
-				});
 			}
 		}
 		// Compare passwords
