@@ -38,10 +38,18 @@ const resetPasswordSchema = z.object({
 		.max(20, "Password is too long"),
 });
 
+// WORKSPACE
+const workspaceSchema = z.object({
+	name: z.string().min(3, "name must be at least 3 characters long"),
+	color: z.string().min(3, "Select a color"),
+	description: z.string().optional(),
+});
+
 export {
 	registerSchema,
 	loginSchema,
 	verifyEmailSchema,
 	resetPasswordRequestSchema,
 	resetPasswordSchema,
+	workspaceSchema,
 };
