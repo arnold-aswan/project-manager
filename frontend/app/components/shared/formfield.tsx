@@ -7,6 +7,7 @@ import {
 	FormField as ShadFormField,
 } from "../ui/form";
 import { Input } from "../ui/input";
+import { Textarea } from "../ui/textarea";
 
 type FormFieldProps = {
 	label: string;
@@ -31,12 +32,21 @@ export const FormField = ({
 				<FormItem>
 					<FormLabel>{label}</FormLabel>
 					<FormControl>
-						<Input
-							{...field}
-							id={name}
-							type={type}
-							placeholder={placeholder}
-						/>
+						{type === "textarea" ? (
+							<Textarea
+								{...field}
+								id={name}
+								placeholder={placeholder}
+								rows={5}
+							/>
+						) : (
+							<Input
+								{...field}
+								id={name}
+								type={type}
+								placeholder={placeholder}
+							/>
+						)}
 					</FormControl>
 					<FormMessage />
 				</FormItem>
