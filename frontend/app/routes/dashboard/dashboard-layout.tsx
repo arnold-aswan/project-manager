@@ -6,13 +6,14 @@ import Header from "@/components/layout/header";
 import { useState } from "react";
 import type { Workspace } from "@/types";
 import Sidebar from "@/components/layout/sidebar";
+import CreateWorkspace from "@/components/workspace/create-workspace";
 
 const DashboardLayout = () => {
 	const { logout } = useAuthStore.getState();
 	const [currentWorkspace, setCurrentWorkspace] = useState<Workspace | null>(
 		null
 	);
-	const [creatingWorkspace, setIsCreatingWorkspace] = useState(false);
+	const [isCreatingWorkspace, setIsCreatingWorkspace] = useState(false);
 
 	const handleSelectWorkspace = (workspace: Workspace) => {
 		setCurrentWorkspace(workspace);
@@ -38,6 +39,11 @@ const DashboardLayout = () => {
 						</div>
 					</main>
 				</div>
+
+				<CreateWorkspace
+					isCreatingWorkspace={isCreatingWorkspace}
+					setIsCreatingWorkspace={setIsCreatingWorkspace}
+				/>
 			</section>
 		</ProtectedRoute>
 	);

@@ -54,3 +54,8 @@ export interface SidebarNavProps {
 	className: string;
 	currentWorkspace: Workspace | null;
 }
+
+export interface CreateWorkspaceProps {
+	isCreatingWorkspace: boolean;
+	setIsCreatingWorkspace: (isCreatingWorkSpace: boolean) => void;
+}
