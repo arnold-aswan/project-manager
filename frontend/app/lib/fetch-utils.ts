@@ -1,4 +1,5 @@
 import axios from "axios";
+import useAuthStore from "@/stores/authstore";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 console.log(`API Base URL: ${BASE_URL}`);
@@ -22,10 +23,13 @@ api.interceptors.response.use(
 
 		if (isUnauthorized && !isResetPasswordRoute) {
 			console.error("Unauthorized access - redirecting to login");
+			// Clear auth state
+			useAuthStore.getState().logout();
 			// Use environment variable properly for frontend
 			const frontendUrl =
 				import.meta.env.VITE_FRONTEND_URL || "http://localhost:5173";
-			// window.location.href = `${frontendUrl}/sign-in`;
+
+			window.location.href = `${frontendUrl}/sign-in`;
 		} else {
 			console.error("API error:", error);
 		}
