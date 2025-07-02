@@ -1,5 +1,3 @@
-import React from "react";
-
 const WorkspaceAvatar = ({ color, name }: { color: string; name: string }) => {
 	return (
 		<div
