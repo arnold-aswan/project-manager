@@ -8,12 +8,20 @@ import {
 } from "../ui/form";
 import { Input } from "../ui/input";
 import { Textarea } from "../ui/textarea";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "../ui/select";
 
 type FormFieldProps = {
 	label: string;
 	name: string;
 	type: string;
 	placeholder?: string;
+	options?: any;
 };
 
 export const FormField = ({
@@ -21,6 +29,7 @@ export const FormField = ({
 	name,
 	type,
 	placeholder,
+	options,
 }: FormFieldProps) => {
 	const form = useFormContext();
 
@@ -28,7 +37,7 @@ export const FormField = ({
 		<ShadFormField
 			control={form.control}
 			name={name}
-			render={({ field }) => (
+			render={({ field }: { field: any }) => (
 				<FormItem>
 					<FormLabel>{label}</FormLabel>
 					<FormControl>
@@ -39,6 +48,22 @@ export const FormField = ({
 								placeholder={placeholder}
 								rows={5}
 							/>
+						) : type === "select" ? (
+							<Select>
+								<SelectTrigger className="w-[180px]">
+									<SelectValue placeholder={placeholder} />
+								</SelectTrigger>
+								<SelectContent>
+									{options?.map((option: string) => (
+										<SelectItem
+											key={option}
+											value={option}
+										>
+											{option}
+										</SelectItem>
+									))}
+								</SelectContent>
+							</Select>
 						) : (
 							<Input
 								{...field}
