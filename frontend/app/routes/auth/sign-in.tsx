@@ -37,7 +37,6 @@ const SignIn = () => {
 	const { loginSuccess } = useAuthStore.getState();
 
 	const handleSubmit = (data: SignInFormData) => {
-		console.log(data);
 		mutate(data, {
 			onSuccess: (data) => {
 				const userData = data as { user: User };
