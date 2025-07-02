@@ -1,3 +1,5 @@
+import type { ProjectStatus } from "@/types";
+
 export const publicRoutes = [
 	"/sign-in",
 	"/sign-up",
@@ -19,10 +21,43 @@ export const colorOptions = [
 	"#34495E",
 ];
 
+type FormatDateOptions = {
+	locale?: string;
+	dateStyle?: "full" | "long" | "medium" | "short";
+	timeStyle?: "full" | "long" | "medium" | "short";
+	hour12?: boolean;
+};
+
 // Date converter
-export const dateFormatter = new Intl.DateTimeFormat("en-KE", {
-	dateStyle: "medium",
-	timeStyle: "short",
-	hour12: true,
-});
-// returns "Jun 25, 2025, 4:06 PM" (Kenyan time)
+export const dateFormatter = (
+	date: Date | string,
+	options?: FormatDateOptions
+): string => {
+	const formatter = new Intl.DateTimeFormat(options?.locale || "en-KE", {
+		dateStyle: options?.dateStyle || "medium",
+		timeStyle: options?.timeStyle,
+		hour12: options?.hour12,
+	});
+	return formatter.format(new Date(date));
+};
+
+// formatDate(new Date()); // Default: "Jul 2, 2025"
+// formatDate(new Date(), { timeStyle: "short", hour12: true }); // "Jul 2, 2025, 12:35 PM"
+// formatDate("2025-07-02T08:00:00Z", { dateStyle: "full" }); // "Wednesday, July 2, 2025"
+
+export const statusColor = (status: ProjectStatus) => {
+	switch (status) {
+		case "Planning":
+			return "px-2 rounded-full bg-violet-100 text-violet-800 dark:bg-violet-900/30 dark:text-violet-300";
+		case "In Progress":
+			return "px-2 rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300";
+		case "Completed":
+			return "px-2 rounded-full bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300";
+		case "Cancelled":
+			return "px-2 rounded-full bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300";
+		case "On Hold":
+			return "px-2 rounded-full bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300";
+		default:
+			return "px-2 rounded-full bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-300";
+	}
+};
