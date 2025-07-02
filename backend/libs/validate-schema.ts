@@ -45,6 +45,30 @@ const workspaceSchema = z.object({
 	description: z.string().optional(),
 });
 
+// PROJECT
+const projectSchema = z.object({
+	title: z.string().min(3, "name must be at least 3 characters long"),
+	description: z.string().optional(),
+	status: z.enum([
+		"Planning",
+		"In Progress",
+		"On Hold",
+		"Completed",
+		"Cancelled",
+	]),
+	startDate: z.string().min(10, "Start date is required!"),
+	dueDate: z.string().min(10, "Due date is required!"),
+	members: z
+		.array(
+			z.object({
+				user: z.string(),
+				role: z.enum(["manager", "contributor", "viewer"]),
+			})
+		)
+		.optional(),
+	tags: z.string().optional(),
+});
+
 export {
 	registerSchema,
 	loginSchema,
@@ -52,4 +76,5 @@ export {
 	resetPasswordRequestSchema,
 	resetPasswordSchema,
 	workspaceSchema,
+	projectSchema,
 };

@@ -2,12 +2,12 @@ import { Request, Response } from "express";
 import Workspace from "../models/workspace";
 import Project from "../models/projects";
 
-interface UserWithId {
+export interface UserWithId {
 	userId: string;
 	// add other properties if needed
 }
 
-const getUser = async (
+export const getUser = async (
 	req: Request,
 	res: Response
 ): Promise<UserWithId | undefined> => {
@@ -118,7 +118,7 @@ const getWorkspaceProjects = async (req: Request, res: Response) => {
 			isArchived: false,
 			"members.user": user.userId,
 		})
-			.populate("tasks", "status")
+			.populate("status") // TODO "tasks" goes here
 			.sort({ createdAt: -1 });
 
 		res.status(200).json({ projects, workspace });
