@@ -39,14 +39,12 @@ const CreateWorkspace = ({
 	});
 
 	const onSubmit = (data: WorkspaceFormData) => {
-		console.log(data);
 		mutate(data, {
 			onSuccess: (data: any) => {
 				form.reset();
 				setIsCreatingWorkspace(false);
 				toast.success("workspace created successfully");
-				console.log(data);
-				navigate(`/workspaces/${data._id}`);
+				navigate(`/workspaces/${data.workspace._id}`);
 			},
 			onError: (error: any) => {
 				console.log("failed creating workspace", error);
