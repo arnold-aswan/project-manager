@@ -1,5 +1,5 @@
 import useAuthStore from "@/stores/authstore";
-import type { HeaderProps } from "@/types";
+import type { HeaderProps, Workspace } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Bell, PlusCircle } from "@/assets/icons";
 import {
@@ -12,7 +12,7 @@ import {
 	DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
-import { Link } from "react-router";
+import { Link, useLoaderData } from "react-router";
 import WorkspaceAvatar from "../workspace/workspace-avatar";
 
 const Header = ({
@@ -21,7 +21,7 @@ const Header = ({
 	onCreateWorkspace,
 }: HeaderProps) => {
 	const { user, logout } = useAuthStore.getState();
-	const workspaces = [];
+	const workspaces = useLoaderData() as { workspaces: Workspace[] };
 	return (
 		<header className="bg-background sticky top-0 z-40 border-b ">
 			<nav className="flex h-14 items-center justify-between px-4 sm:px-6 lg:px-8 py-4">
@@ -49,7 +49,7 @@ const Header = ({
 						<DropdownMenuSeparator />
 
 						<DropdownMenuGroup>
-							{workspaces.map((ws) => (
+							{workspaces.workspaces.map((ws) => (
 								<DropdownMenuItem
 									key={ws._id}
 									onClick={() => onSelectedWorkspace(ws)}
@@ -58,6 +58,7 @@ const Header = ({
 										color={ws.color}
 										name={ws.name}
 									/>
+									<small>{ws.name}</small>
 								</DropdownMenuItem>
 							))}
 						</DropdownMenuGroup>

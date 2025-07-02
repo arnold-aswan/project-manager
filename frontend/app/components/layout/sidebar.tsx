@@ -33,8 +33,8 @@ const Sidebar = ({
 			icon: LayoutDashboard,
 		},
 		{
-			title: "workspace",
-			href: "/workspace",
+			title: "workspaces",
+			href: "/workspaces",
 			icon: Users,
 		},
 		{
