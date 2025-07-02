@@ -14,4 +14,7 @@ export {
 	ChevronsRight,
 	ChevronsLeft,
 	LogOut,
+	LayoutGrid,
+	UserPlus,
+	Calendar,
 } from "lucide-react";
