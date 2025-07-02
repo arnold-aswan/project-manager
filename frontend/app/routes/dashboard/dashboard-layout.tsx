@@ -1,15 +1,23 @@
 import { Outlet } from "react-router";
 import { ProtectedRoute } from "@/components/auth/auth-wrapper";
-import { Button } from "@/components/ui/button";
-import useAuthStore from "@/stores/authstore";
 import Header from "@/components/layout/header";
 import { useState } from "react";
 import type { Workspace } from "@/types";
 import Sidebar from "@/components/layout/sidebar";
 import CreateWorkspace from "@/components/workspace/create-workspace";
+import { fetchData } from "@/lib/fetch-utils";
+
+// Prefetch workspace data
+export const clientLoader = async () => {
+	try {
+		const [workspaces] = await Promise.all([fetchData("/workspaces")]);
+		return { workspaces };
+	} catch (error) {
+		console.log("Error fetching workspaces", error);
+	}
+};
 
 const DashboardLayout = () => {
-	const { logout } = useAuthStore.getState();
 	const [currentWorkspace, setCurrentWorkspace] = useState<Workspace | null>(
 		null
 	);
