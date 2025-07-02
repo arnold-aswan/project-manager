@@ -1,3 +1,4 @@
+import { ProjectStatus } from "@/types";
 import { z } from "zod";
 
 export const signInSchema = z.object({
@@ -47,4 +48,21 @@ export const workspaceSchema = z.object({
 	name: z.string().min(3, "name must be at least 3 characters long"),
 	color: z.string().min(3, "Select a color"),
 	description: z.string().optional(),
+});
+
+export const projectSchema = z.object({
+	title: z.string().min(3, "name must be at least 3 characters long"),
+	description: z.string().optional(),
+	status: z.nativeEnum(ProjectStatus),
+	startDate: z.string().min(10, "Start date is required!"),
+	dueDate: z.string().min(10, "Due date is required!"),
+	members: z
+		.array(
+			z.object({
+				user: z.string(),
+				role: z.enum(["admin", "member", "owner", "viewer"]),
+			})
+		)
+		.optional(),
+	tags: z.string().optional(),
 });
