@@ -27,8 +27,7 @@ const WorkspaceCard = ({ workspace }: { workspace: Workspace }) => {
 							<div>
 								<CardTitle>{workspace.name}</CardTitle>
 								<small className="text-muted-foreground">
-									Created at{" "}
-									{dateFormatter.format(new Date(workspace.createdAt))}
+									Created at {dateFormatter(workspace.createdAt)}
 								</small>
 							</div>
 						</div>

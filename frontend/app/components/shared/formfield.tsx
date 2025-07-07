@@ -49,7 +49,11 @@ export const FormField = ({
 								rows={5}
 							/>
 						) : type === "select" ? (
-							<Select>
+							<Select
+								onValueChange={field.onChange}
+								value={field.value}
+								defaultValue={field.value}
+							>
 								<SelectTrigger className="w-[180px]">
 									<SelectValue placeholder={placeholder} />
 								</SelectTrigger>

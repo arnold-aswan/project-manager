@@ -14,7 +14,6 @@ import { Progress } from "../ui/progress";
 import { Calendar } from "@/assets/icons";
 
 const ProjectCard = ({ project, progress, workspaceId }: ProjectCardProps) => {
-	console.log(project, progress);
 	return (
 		<Link to={`/workspaces/${workspaceId}/projects/${project._id}`}>
 			<Card className="transition-all duration-300 hover:shadow-md hover:translate-y-1">
