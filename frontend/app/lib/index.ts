@@ -1,4 +1,4 @@
-import type { ProjectStatus } from "@/types";
+import type { ProjectStatus, TaskStatusFilter } from "@/types";
 
 export const publicRoutes = [
 	"/sign-in",
@@ -59,5 +59,37 @@ export const statusColor = (status: ProjectStatus) => {
 			return "px-2 rounded-full bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300";
 		default:
 			return "px-2 rounded-full bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-300";
+	}
+};
+
+export const getProjectProgress = (tasks: { status: TaskStatusFilter }[]) => {
+	const totalTasks = tasks.length;
+
+	const completedTasks = tasks.filter((task) => task?.status === "Done").length;
+
+	const progress =
+		totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+	return progress;
+};
+
+export const getTaskPriorityColor = (priority: string) => {
+	switch (priority.toLowerCase()) {
+		case "high":
+			return "bg-red-500 text-white";
+		case "medium":
+			return "bg-orange-500 text-white";
+		default:
+			return "bg-slate-500 text-white";
+	}
+};
+
+export const getTaskPriorityVariant = (priority: string) => {
+	switch (priority.toLowerCase()) {
+		case "high":
+			return "destructive";
+		case "medium":
+			return "default";
+		default:
+			return "outline";
 	}
 };
