@@ -16,7 +16,7 @@ const logActivity = async (
 			details,
 		});
 	} catch (error) {
-		console.log("Error logging activity:", error);
+		console.error("Error logging activity:", error);
 	}
 };
 
