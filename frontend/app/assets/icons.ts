@@ -17,4 +17,10 @@ export {
 	LayoutGrid,
 	UserPlus,
 	Calendar,
+	MoveLeft,
+	Clock,
+	CircleAlert,
+	EyeOff,
+	Eye,
+	Edit,
 } from "lucide-react";

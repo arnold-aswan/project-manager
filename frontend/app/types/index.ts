@@ -1,5 +1,4 @@
 import type { LucideIcon } from "lucide-react";
-
 export interface User {
 	_id: string;
 	fullname: string;
@@ -67,7 +66,7 @@ export interface Task {
 	title: string;
 	description?: string;
 	project: Project;
-	status: TaskStatus;
+	status: TaskStatus | "To Do" | "In Progress" | "Done";
 	priority: "Low" | "Medium" | "High";
 	assignees: User[];
 	watchers?: User[];
@@ -157,4 +156,19 @@ export interface MemberProps {
 	user: User;
 	role: "admin" | "member" | "owner" | "viewer";
 	joinedAt: Date;
+}
+
+export type TaskStatusFilter = "To Do" | "In Progress" | "Done";
+export type TaskPriority = "Low" | "Medium" | "High";
+export enum ProjectMemberRole {
+	MANAGER = "manager",
+	CONTRIBUTOR = "contributor",
+	VIEWER = "viewer",
+}
+
+export interface CreateTaskDialogProps {
+	open: boolean;
+	onOpenChange: (open: boolean) => void;
+	projectId: string;
+	projectMembers: { user: User; role: ProjectMemberRole }[];
 }
