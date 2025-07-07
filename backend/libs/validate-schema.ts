@@ -69,6 +69,16 @@ const projectSchema = z.object({
 	tags: z.string().optional(),
 });
 
+const taskSchema = z.object({
+	title: z.string().min(3, "Title must be at least 3 characters long"),
+	description: z.string().optional(),
+	assignees: z.array(z.string()).min(1, "At least one assignee is required"),
+	status: z.enum(["To Do", "In Progress", "Done"]),
+	priority: z.enum(["Low", "Medium", "High"]),
+	dueDate: z.string().min(1, "Due date is required"),
+	projectId: z.string().min(1, "Project ID is required"),
+});
+
 export {
 	registerSchema,
 	loginSchema,
@@ -77,4 +87,5 @@ export {
 	resetPasswordSchema,
 	workspaceSchema,
 	projectSchema,
+	taskSchema,
 };
