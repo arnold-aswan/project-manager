@@ -21,7 +21,6 @@ const WorkspaceDetails = () => {
 	};
 
 	if (isPending) return <Loader />;
-	console.log(data);
 
 	return (
 		<section className="space-y-8">
