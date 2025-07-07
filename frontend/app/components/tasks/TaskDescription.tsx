@@ -1,32 +1,38 @@
+import { useUpdateTaskDescriptionMutation } from "@/hooks/useTasks";
 import { useState } from "react";
-import { Input } from "../ui/input";
+import { toast } from "sonner";
 import { Button } from "../ui/button";
 import { Edit, Loader2 } from "@/assets/icons";
-import { useUpdateTaskTitleMutation } from "@/hooks/useTasks";
-import { toast } from "sonner";
+import { Textarea } from "../ui/textarea";
 
-const TaskTitle = ({ title, taskId }: { title: string; taskId: string }) => {
+const TaskDescription = ({
+	description,
+	taskId,
+}: {
+	description: string;
+	taskId: string;
+}) => {
 	const [isEditing, setIsEditing] = useState(false);
-	const [newTitle, setNewTitle] = useState(title);
+	const [newDescription, setNewDescription] = useState(description);
 
-	const { mutate, isPending } = useUpdateTaskTitleMutation();
+	const { mutate, isPending } = useUpdateTaskDescriptionMutation();
 
 	const updateTitle = () => {
-		if (newTitle.trim().length < 4) {
+		if (newDescription.trim().length < 4) {
 			toast.error("Title must be at least 4 characters long.");
 			return;
 		}
 
-		if (newTitle.trim() === title.trim()) {
+		if (newDescription.trim() === description.trim()) {
 			setIsEditing(false);
 			return; // No change, so skip update
 		}
 		mutate(
-			{ taskId, title: newTitle },
+			{ taskId, description: newDescription },
 			{
 				onSuccess: (data: any) => {
 					setIsEditing(false);
-					toast.success("Task title updated successfully!");
+					toast.success("Task description updated successfully!");
 				},
 				onError: (error: any) => {
 					setIsEditing(false);
@@ -41,14 +47,16 @@ const TaskTitle = ({ title, taskId }: { title: string; taskId: string }) => {
 	return (
 		<div className="flex items-center gap-2">
 			{isEditing ? (
-				<Input
-					value={newTitle}
-					onChange={(e) => setNewTitle(e.target.value)}
+				<Textarea
+					value={newDescription}
+					onChange={(e) => setNewDescription(e.target.value)}
 					disabled={isPending}
-					className="text-xl font-semibold w-full"
+					className=" w-full"
 				/>
 			) : (
-				<h2 className="text-lg flex-1 font-semibold">{title}</h2>
+				<p className="text-base text-pretty flex-1 to-muted-foreground">
+					{description}
+				</p>
 			)}
 
 			{isEditing ? (
@@ -76,4 +84,4 @@ const TaskTitle = ({ title, taskId }: { title: string; taskId: string }) => {
 	);
 };
 
-export default TaskTitle;
+export default TaskDescription;

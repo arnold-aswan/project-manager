@@ -39,7 +39,55 @@ export const useUpdateTaskTitleMutation = () => {
 		},
 		onSuccess: (data: any) => {
 			queryClient.invalidateQueries({
-				queryKey: ["task", data._id],
+				queryKey: ["task", data.task._id],
+			});
+		},
+	});
+};
+
+export const useUpdateTaskStatusMutation = () => {
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: (data: { taskId: string; status: string }) => {
+			return updateData(`/tasks/${data.taskId}/status`, {
+				status: data.status,
+			});
+		},
+		onSuccess: (data: any) => {
+			queryClient.invalidateQueries({
+				queryKey: ["task", data.task._id],
+			});
+		},
+	});
+};
+
+export const useUpdateTaskDescriptionMutation = () => {
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: (data: { taskId: string; description: string }) => {
+			return updateData(`/tasks/${data.taskId}/description`, {
+				description: data.description,
+			});
+		},
+		onSuccess: (data: any) => {
+			queryClient.invalidateQueries({
+				queryKey: ["task", data.task._id],
+			});
+		},
+	});
+};
+
+export const useUpdateTaskAssigneesMutation = () => {
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: (data: { taskId: string; assignees: string[] }) => {
+			return updateData(`/tasks/${data.taskId}/assignees`, {
+				assignees: data.assignees,
+			});
+		},
+		onSuccess: (data: any) => {
+			queryClient.invalidateQueries({
+				queryKey: ["task", data.task._id],
 			});
 		},
 	});
