@@ -23,4 +23,13 @@ export {
 	EyeOff,
 	Eye,
 	Edit,
+	Building2,
+	CheckSquare,
+	FileEdit,
+	FolderEdit,
+	FolderPlus,
+	LogIn,
+	MessageSquare,
+	Upload,
+	UserMinus,
 } from "lucide-react";
