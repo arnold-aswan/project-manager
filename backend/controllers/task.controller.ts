@@ -4,6 +4,8 @@ import Workspace from "../models/workspace";
 import { getUser } from "./workspace.controller";
 import Task from "../models/task";
 import { logActivity } from "../libs";
+import ActivityLog from "../models/activity";
+import Comment from "../models/comment";
 
 const createTask = async (req: Request, res: Response) => {
 	try {
@@ -271,6 +273,224 @@ const updateTaskAssignees = async (req: Request, res: Response) => {
 	}
 };
 
+const updateTaskPriority = async (req: Request, res: Response) => {
+	try {
+		const { taskId } = req.params;
+		const { priority } = req.body;
+
+		const task = await Task.findById(taskId);
+		if (!task) {
+			res.status(404).json({ message: "Task not found!" });
+			return;
+		}
+
+		const project = await Project.findById(task.project);
+		if (!project) {
+			res.status(404).json({ message: "Project not found!" });
+			return;
+		}
+
+		const user = await getUser(req, res);
+		if (!user) return;
+
+		const isMember = project.members.some(
+			(member) => String(member.user) === String(user.userId)
+		);
+		if (!isMember) {
+			res.status(403).json({ message: "You are not a member of this project" });
+			return;
+		}
+
+		task.priority = priority;
+		await task.save();
+
+		logActivity(user.userId, "updated_task", "Task", taskId, {
+			description: "Task priority updated",
+		});
+
+		res
+			.status(200)
+			.json({ message: "Task priority updated successfully", task });
+		return;
+	} catch (error) {
+		console.error("Error getting project task::", error);
+		res.status(500).json({ message: "Internal server error" });
+		return;
+	}
+};
+
+const createSubTask = async (req: Request, res: Response) => {
+	try {
+		const { taskId } = req.params;
+		const { title } = req.body;
+
+		const task = await Task.findById(taskId);
+		if (!task) {
+			res.status(404).json({ message: "Task not found!" });
+			return;
+		}
+
+		const project = await Project.findById(task.project);
+		if (!project) {
+			res.status(404).json({ message: "Project not found!" });
+			return;
+		}
+
+		const user = await getUser(req, res);
+		if (!user) return;
+
+		const isMember = project.members.some(
+			(member) => String(member.user) === String(user.userId)
+		);
+		if (!isMember) {
+			res.status(403).json({ message: "You are not a member of this project" });
+			return;
+		}
+
+		const newSubTask = {
+			title,
+			completed: false,
+		};
+
+		task.subTasks.push(newSubTask);
+		await task.save();
+
+		logActivity(user.userId, "created_subtask", "Task", taskId, {
+			description: "Created a new Sub task",
+		});
+
+		res.status(200).json({ message: "Sub task created successfully", task });
+		return;
+	} catch (error) {
+		console.error("Error creating sub task::", error);
+		res.status(500).json({ message: "Internal server error" });
+		return;
+	}
+};
+
+const updateSubTask = async (req: Request, res: Response) => {
+	try {
+		const { taskId, subTaskId } = req.params;
+		const { completed } = req.body;
+
+		const task = await Task.findById(taskId);
+		if (!task) {
+			res.status(404).json({ message: "Task not found!" });
+			return;
+		}
+
+		const subTask = task.subTasks.find(
+			(subTask) => String(subTask._id) === String(subTaskId)
+		);
+
+		if (!subTask) {
+			res.status(404).json({ message: "Sub task not found!" });
+			return;
+		}
+
+		const user = await getUser(req, res);
+		if (!user) return;
+
+		subTask.completed = completed;
+		await task.save();
+
+		logActivity(user.userId, "updated_subtask", "Task", taskId, {
+			description: "Updated Sub task task",
+		});
+
+		res.status(200).json({ message: "Sub task updated successfully", task });
+		return;
+	} catch (error) {
+		console.error("Error updating sub task::", error);
+		res.status(500).json({ message: "Internal server error" });
+		return;
+	}
+};
+
+const getActivityByResourceId = async (req: Request, res: Response) => {
+	try {
+		const { resourceId } = req.params;
+
+		const activity = await ActivityLog.find({ resourceId })
+			.populate("user", "fullname avatar")
+			.sort({ createdAt: -1 });
+
+		res.status(200).json(activity);
+		return;
+	} catch (error) {
+		console.error("Error getting activity::", error);
+		res.status(500).json({ message: "Internal server error" });
+		return;
+	}
+};
+
+const getCommentsByTaskId = async (req: Request, res: Response) => {
+	try {
+		const { taskId } = req.params;
+
+		const comments = await Comment.find({ task: taskId })
+			.populate("author", "fullname avatar")
+			.sort({ created: -1 })
+			.limit(20);
+
+		res.status(200).json(comments);
+	} catch (error) {
+		console.error("Error fetching comments::", error);
+		res.status(500).json({ message: "Internal server error" });
+		return;
+	}
+};
+
+const addComment = async (req: Request, res: Response) => {
+	try {
+		const { taskId } = req.params;
+		const { text } = req.body;
+
+		const task = await Task.findById(taskId);
+		if (!task) {
+			res.status(404).json({ message: "Task not found!" });
+			return;
+		}
+
+		const project = await Project.findById(task.project);
+		if (!project) {
+			res.status(404).json({ message: "Project not found!" });
+			return;
+		}
+
+		const user = await getUser(req, res);
+		if (!user) return;
+
+		const isMember = project.members.some(
+			(member) => String(member.user) === String(user.userId)
+		);
+		if (!isMember) {
+			res.status(403).json({ message: "You are not a member of this project" });
+			return;
+		}
+
+		const newComment = await Comment.create({
+			text,
+			task: taskId,
+			author: user.userId,
+		});
+
+		task.comments.push(newComment._id);
+		await task.save();
+
+		logActivity(user.userId, "added_comment", "Task", taskId, {
+			description: "Added a comment",
+		});
+
+		res.status(200).json({ message: "Comment added successfully", task });
+		return;
+	} catch (error) {
+		console.error("Error creating comment::", error);
+		res.status(500).json({ message: "Internal server error" });
+		return;
+	}
+};
+
 export {
 	createTask,
 	getTaskById,
@@ -278,4 +498,10 @@ export {
 	updateTaskDescription,
 	updateTaskStatus,
 	updateTaskAssignees,
+	updateTaskPriority,
+	createSubTask,
+	updateSubTask,
+	getActivityByResourceId,
+	getCommentsByTaskId,
+	addComment,
 };
