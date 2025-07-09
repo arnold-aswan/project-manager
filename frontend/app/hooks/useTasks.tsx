@@ -1,6 +1,8 @@
 import type { CreateTaskFormData } from "@/components/modals/CreateTask";
 import { fetchData, postData, updateData } from "@/lib/fetch-utils";
+import type { TaskPriority } from "@/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { string } from "zod";
 
 export const useCreateTaskMutation = () => {
 	const queryClient = useQueryClient();
@@ -29,6 +31,26 @@ export const useGetTaskByIdQuery = (taskId: string) => {
 	});
 };
 
+export const useTaskActivity = (resourceId: string) => {
+	return useQuery({
+		queryKey: ["task-activity", resourceId],
+		queryFn: () => fetchData(`/tasks/${resourceId}/activity`),
+		enabled: !!resourceId,
+		staleTime: 1000 * 60 * 5, // 5 minutes
+		refetchOnWindowFocus: true,
+	});
+};
+
+export const useGetCommentsByTaskIdQuery = (taskId: string) => {
+	return useQuery({
+		queryKey: ["comments", taskId],
+		queryFn: () => fetchData(`/tasks/${taskId}/comments`),
+		enabled: !!taskId,
+		staleTime: 1000 * 60 * 5, // 5 minutes
+		refetchOnWindowFocus: true,
+	});
+};
+
 export const useUpdateTaskTitleMutation = () => {
 	const queryClient = useQueryClient();
 	return useMutation({
@@ -38,8 +60,14 @@ export const useUpdateTaskTitleMutation = () => {
 			});
 		},
 		onSuccess: (data: any) => {
+			const taskId = data?.task?._id;
+			if (!taskId) return;
+
 			queryClient.invalidateQueries({
-				queryKey: ["task", data.task._id],
+				queryKey: ["task", taskId],
+			});
+			queryClient.invalidateQueries({
+				queryKey: ["task-activity", taskId],
 			});
 		},
 	});
@@ -54,8 +82,14 @@ export const useUpdateTaskStatusMutation = () => {
 			});
 		},
 		onSuccess: (data: any) => {
+			const taskId = data?.task?._id;
+			if (!taskId) return;
+
 			queryClient.invalidateQueries({
-				queryKey: ["task", data.task._id],
+				queryKey: ["task", taskId],
+			});
+			queryClient.invalidateQueries({
+				queryKey: ["task-activity", taskId],
 			});
 		},
 	});
@@ -70,8 +104,14 @@ export const useUpdateTaskDescriptionMutation = () => {
 			});
 		},
 		onSuccess: (data: any) => {
+			const taskId = data?.task?._id;
+			if (!taskId) return;
+
 			queryClient.invalidateQueries({
-				queryKey: ["task", data.task._id],
+				queryKey: ["task", taskId],
+			});
+			queryClient.invalidateQueries({
+				queryKey: ["task-activity", taskId],
 			});
 		},
 	});
@@ -86,8 +126,109 @@ export const useUpdateTaskAssigneesMutation = () => {
 			});
 		},
 		onSuccess: (data: any) => {
+			const taskId = data?.task?._id;
+			if (!taskId) return;
+
 			queryClient.invalidateQueries({
-				queryKey: ["task", data.task._id],
+				queryKey: ["task", taskId],
+			});
+			queryClient.invalidateQueries({
+				queryKey: ["task-activity", taskId],
+			});
+		},
+	});
+};
+
+export const useUpdateTaskPriorityMutation = () => {
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: (data: { taskId: string; priority: TaskPriority }) => {
+			return updateData(`/tasks/${data.taskId}/priority`, {
+				priority: data.priority,
+			});
+		},
+		onSuccess: (data: any) => {
+			const taskId = data?.task?._id;
+			if (!taskId) return;
+
+			queryClient.invalidateQueries({
+				queryKey: ["task", taskId],
+			});
+			queryClient.invalidateQueries({
+				queryKey: ["task-activity", taskId],
+			});
+		},
+	});
+};
+
+export const useAddSubTaskMutation = () => {
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: (data: { taskId: string; title: string }) => {
+			return postData(`/tasks/${data.taskId}/add-subtask`, {
+				title: data.title,
+			});
+		},
+		onSuccess: (data: any) => {
+			const taskId = data?.task?._id;
+			if (!taskId) return;
+
+			queryClient.invalidateQueries({
+				queryKey: ["task", taskId],
+			});
+			queryClient.invalidateQueries({
+				queryKey: ["task-activity", taskId],
+			});
+		},
+	});
+};
+
+export const useUpdateSubTaskMutation = () => {
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: (data: {
+			taskId: string;
+			subTaskId: string;
+			completed: boolean;
+		}) => {
+			return updateData(
+				`/tasks/${data.taskId}/update-subtask/${data.subTaskId}`,
+				{
+					completed: data.completed,
+				}
+			);
+		},
+		onSuccess: (data: any) => {
+			const taskId = data?.task?._id;
+			if (!taskId) return;
+
+			queryClient.invalidateQueries({
+				queryKey: ["task", taskId],
+			});
+			queryClient.invalidateQueries({
+				queryKey: ["task-activity", taskId],
+			});
+		},
+	});
+};
+
+export const useAddCommentMutation = () => {
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: (data: { taskId: string; text: string }) => {
+			return postData(`/tasks/${data.taskId}/add-comment`, {
+				text: data.text,
+			});
+		},
+		onSuccess: (data: any) => {
+			const taskId = data?.task?._id;
+			if (!taskId) return;
+
+			queryClient.invalidateQueries({
+				queryKey: ["comments", taskId],
+			});
+			queryClient.invalidateQueries({
+				queryKey: ["task-activity", taskId],
 			});
 		},
 	});

@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { useGetTaskByIdQuery } from "@/hooks/useTasks";
 import useAuthStore from "@/stores/authstore";
 import type { Project, Task } from "@/types";
-import React from "react";
 import { useParams } from "react-router";
 import { Eye, EyeOff } from "@/assets/icons";
 import { getTaskPriorityVariant } from "@/lib";
@@ -14,6 +13,11 @@ import { formatDistanceToNow } from "date-fns";
 import TaskStatusSelector from "@/components/tasks/TaskStatusSelector";
 import TaskDescription from "@/components/tasks/TaskDescription";
 import TaskAssigneeSelector from "@/components/tasks/TaskAssigneeSelector";
+import TaskPrioritySelector from "@/components/tasks/TaskPrioritySelector";
+import SubTaskDetails from "@/components/tasks/SubTaskDetails";
+import CommentSection from "@/components/tasks/CommentSection";
+import Watchers from "@/components/tasks/Watchers";
+import TaskActivity from "@/components/tasks/TaskActivity";
 
 const TaskDetails = () => {
 	const { projectId, taskId, workspaceId } = useParams<{
@@ -32,8 +36,6 @@ const TaskDetails = () => {
 		data: { task: Task; project: Project };
 		isPending: boolean;
 	};
-
-	console.log(data);
 
 	const isUserWatching = data?.task?.watchers?.some(
 		(watcher) => String(watcher._id) === String(user?._id)
@@ -93,8 +95,8 @@ const TaskDetails = () => {
 				</div>
 			</header>
 
-			<div className=" grid grid-cols-1 md:grid-cols-2 gap-6">
-				<div className="lg:col-span-2">
+			<main className="flex flex-col lg:flex-row gap-6">
+				<div className="lg:basis-2/3 w-full">
 					<div className="bg-card rounded-lg p-6 shadow-sm mb-6 ">
 						<div className="flex flex-col md:flex-row justify-between items-start mb-4">
 							<div>
@@ -157,9 +159,29 @@ const TaskDetails = () => {
 							task={data?.task}
 							projectMembers={data?.project?.members as any}
 						/>
+
+						<TaskPrioritySelector
+							priority={data?.task?.priority}
+							taskId={data?.task?._id}
+						/>
+
+						<SubTaskDetails
+							subTasks={data?.task?.subTasks || []}
+							taskId={data?.task?._id}
+						/>
 					</div>
+
+					<CommentSection
+						projectMembers={data?.project?.members as any}
+						taskId={data?.task?._id}
+					/>
 				</div>
-			</div>
+
+				<aside className="lg:basis-1/3 w-full">
+					<Watchers watchers={data?.task?.watchers || []} />
+					<TaskActivity resourceId={data?.task?._id} />
+				</aside>
+			</main>
 		</section>
 	);
 };
