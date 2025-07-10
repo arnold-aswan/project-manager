@@ -4,6 +4,7 @@ import { validateRequest } from "zod-express-middleware";
 import { z } from "zod";
 import {
 	addComment,
+	archiveTask,
 	createSubTask,
 	createTask,
 	getActivityByResourceId,
@@ -15,6 +16,7 @@ import {
 	updateTaskPriority,
 	updateTaskStatus,
 	updateTaskTitle,
+	watchTask,
 } from "../controllers/task.controller";
 import { taskSchema } from "../libs/validate-schema";
 
@@ -93,6 +95,28 @@ router.post(
 		}),
 	}),
 	addComment
+);
+
+router.post(
+	"/:taskId/watch",
+	authMiddleware,
+	validateRequest({
+		params: z.object({
+			taskId: z.string(),
+		}),
+	}),
+	watchTask
+);
+
+router.post(
+	"/:taskId/archive",
+	authMiddleware,
+	validateRequest({
+		params: z.object({
+			taskId: z.string(),
+		}),
+	}),
+	archiveTask
 );
 
 // PUT

@@ -6,6 +6,7 @@ import Task from "../models/task";
 import { logActivity } from "../libs";
 import ActivityLog from "../models/activity";
 import Comment from "../models/comment";
+import mongoose, { Types } from "mongoose";
 
 const createTask = async (req: Request, res: Response) => {
 	try {
@@ -491,6 +492,112 @@ const addComment = async (req: Request, res: Response) => {
 	}
 };
 
+const watchTask = async (req: Request, res: Response) => {
+	try {
+		const { taskId } = req.params;
+
+		const task = await Task.findById(taskId);
+		if (!task) {
+			res.status(404).json({ message: "Task not found!" });
+			return;
+		}
+
+		const project = await Project.findById(task.project);
+		if (!project) {
+			res.status(404).json({ message: "Project not found!" });
+			return;
+		}
+
+		const user = await getUser(req, res);
+		if (!user) return;
+
+		const isMember = project.members.some(
+			(member) => String(member.user) === String(user.userId)
+		);
+		if (!isMember) {
+			res.status(403).json({ message: "You are not a member of this project" });
+			return;
+		}
+
+		const userId = new mongoose.Types.ObjectId(user.userId);
+		const isWatching = task.watchers.includes(userId);
+		if (!isWatching) {
+			task.watchers.push(userId);
+		} else {
+			task.watchers = task.watchers.filter(
+				(watcher) => String(watcher) !== String(user.userId)
+			);
+		}
+
+		await task.save();
+
+		logActivity(user.userId, "updated_task", "Task", taskId, {
+			description: `${
+				isWatching ? "Stopped watching task." : "Started watching task."
+			}`,
+		});
+
+		res.status(200).json({
+			message: `${
+				isWatching ? "Stopped watching task." : "Started watching task."
+			}`,
+			task,
+		});
+		return;
+	} catch (error) {
+		console.error("Error watching task::", error);
+		res.status(500).json({ message: "Internal server error" });
+		return;
+	}
+};
+
+const archiveTask = async (req: Request, res: Response) => {
+	try {
+		const { taskId } = req.params;
+
+		const task = await Task.findById(taskId);
+		if (!task) {
+			res.status(404).json({ message: "Task not found!" });
+			return;
+		}
+
+		const project = await Project.findById(task.project);
+		if (!project) {
+			res.status(404).json({ message: "Project not found!" });
+			return;
+		}
+
+		const user = await getUser(req, res);
+		if (!user) return;
+
+		const isMember = project.members.some(
+			(member) => String(member.user) === String(user.userId)
+		);
+		if (!isMember) {
+			res.status(403).json({ message: "You are not a member of this project" });
+			return;
+		}
+
+		const isTaskArchived = task.isArchived;
+		task.isArchived = !isTaskArchived;
+		await task.save();
+
+		logActivity(user.userId, "updated_task", "Task", taskId, {
+			description: `${isTaskArchived ? "Unarchive task." : "Archived task."}`,
+		});
+
+		res.status(200).json({
+			message: `${isTaskArchived ? "Unarchive task." : "Archived task."}`,
+			task,
+		});
+		return;
+	} catch (error) {
+		console.error("Error archiving task::", error);
+		res.status(500).json({ message: "Internal server error" });
+		return;
+	}
+};
+
 export {
 	createTask,
 	getTaskById,
@@ -504,4 +611,6 @@ export {
 	getActivityByResourceId,
 	getCommentsByTaskId,
 	addComment,
+	watchTask,
+	archiveTask,
 };
