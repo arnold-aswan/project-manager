@@ -233,3 +233,41 @@ export const useAddCommentMutation = () => {
 		},
 	});
 };
+
+export const useWatchTaskMutation = () => {
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: (data: { taskId: string }) =>
+			postData(`/tasks/${data.taskId}/watch`, {}),
+		onSuccess: (data: any) => {
+			const taskId = data?.task?._id;
+			if (!taskId) return;
+
+			queryClient.invalidateQueries({
+				queryKey: ["task", taskId],
+			});
+			queryClient.invalidateQueries({
+				queryKey: ["task-activity", taskId],
+			});
+		},
+	});
+};
+
+export const useArchiveMutation = () => {
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: (data: { taskId: string }) =>
+			postData(`/tasks/${data.taskId}/archive`, {}),
+		onSuccess: (data: any) => {
+			const taskId = data?.task?._id;
+			if (!taskId) return;
+
+			queryClient.invalidateQueries({
+				queryKey: ["task", taskId],
+			});
+			queryClient.invalidateQueries({
+				queryKey: ["task-activity", taskId],
+			});
+		},
+	});
+};

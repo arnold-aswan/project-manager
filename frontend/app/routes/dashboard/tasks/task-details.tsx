@@ -2,7 +2,11 @@ import BackButton from "@/components/shared/back-button";
 import Loader from "@/components/shared/loader";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { useGetTaskByIdQuery } from "@/hooks/useTasks";
+import {
+	useArchiveMutation,
+	useGetTaskByIdQuery,
+	useWatchTaskMutation,
+} from "@/hooks/useTasks";
 import useAuthStore from "@/stores/authstore";
 import type { Project, Task } from "@/types";
 import { useParams } from "react-router";
@@ -18,6 +22,7 @@ import SubTaskDetails from "@/components/tasks/SubTaskDetails";
 import CommentSection from "@/components/tasks/CommentSection";
 import Watchers from "@/components/tasks/Watchers";
 import TaskActivity from "@/components/tasks/TaskActivity";
+import { toast } from "sonner";
 
 const TaskDetails = () => {
 	const { projectId, taskId, workspaceId } = useParams<{
@@ -36,11 +41,45 @@ const TaskDetails = () => {
 		data: { task: Task; project: Project };
 		isPending: boolean;
 	};
+	const { mutate: watchTaskMutate, isPending: isWatching } =
+		useWatchTaskMutation();
+	const { mutate: archiveTaskMutate, isPending: isArchiving } =
+		useArchiveMutation();
 
 	const isUserWatching = data?.task?.watchers?.some(
 		(watcher) => String(watcher._id) === String(user?._id)
 	);
 	const members = data?.task?.assignees || [];
+
+	const handleWatch = () => {
+		watchTaskMutate(
+			{ taskId: taskId },
+			{
+				onSuccess: (data: any) => {
+					toast.success(data.message);
+				},
+				onError: (error: any) => {
+					toast.error("Failed to watch task.");
+					console.error(error);
+				},
+			}
+		);
+	};
+
+	const handleArchive = () => {
+		archiveTaskMutate(
+			{ taskId: taskId },
+			{
+				onSuccess: (data: any) => {
+					toast.success(data.message);
+				},
+				onError: (error: any) => {
+					toast.error("Failed to watch task.");
+					console.error(error);
+				},
+			}
+		);
+	};
 
 	if (isPending) return <Loader />;
 	if (!data) {
@@ -68,8 +107,9 @@ const TaskDetails = () => {
 					<Button
 						variant={"outline"}
 						size={"sm"}
-						onClick={() => {}}
+						onClick={handleWatch}
 						className="w-fit"
+						disabled={isWatching}
 					>
 						{isUserWatching ? (
 							<>
@@ -87,8 +127,9 @@ const TaskDetails = () => {
 					<Button
 						variant={"outline"}
 						size={"sm"}
-						onClick={() => {}}
+						onClick={handleArchive}
 						className="w-fit"
+						disabled={isArchiving}
 					>
 						{data?.task?.isArchived ? "Unarchive" : "Archive"}
 					</Button>
