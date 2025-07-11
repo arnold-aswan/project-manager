@@ -598,6 +598,24 @@ const archiveTask = async (req: Request, res: Response) => {
 	}
 };
 
+const myTasks = async (req: Request, res: Response) => {
+	try {
+		const user = await getUser(req, res);
+		if (!user) return;
+
+		const myTasks = await Task.find({ assignees: { $in: [user.userId] } })
+			.populate("project", "title workspace")
+			.sort({ createdAt: -1 });
+		console.log(myTasks);
+		res.status(200).json(myTasks);
+		return;
+	} catch (error) {
+		console.error("Error fetching task::", error);
+		res.status(500).json({ message: "Internal server error" });
+		return;
+	}
+};
+
 export {
 	createTask,
 	getTaskById,
@@ -613,4 +631,5 @@ export {
 	addComment,
 	watchTask,
 	archiveTask,
+	myTasks,
 };

@@ -10,6 +10,7 @@ import {
 	getActivityByResourceId,
 	getCommentsByTaskId,
 	getTaskById,
+	myTasks,
 	updateSubTask,
 	updateTaskAssignees,
 	updateTaskDescription,
@@ -23,6 +24,8 @@ import { taskSchema } from "../libs/validate-schema";
 const router = express.Router();
 
 //  GET
+router.get("/my-tasks", authMiddleware, myTasks);
+
 router.get(
 	"/:taskId",
 	authMiddleware,
