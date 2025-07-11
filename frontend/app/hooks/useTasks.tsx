@@ -2,7 +2,6 @@ import type { CreateTaskFormData } from "@/components/modals/CreateTask";
 import { fetchData, postData, updateData } from "@/lib/fetch-utils";
 import type { TaskPriority } from "@/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { string } from "zod";
 
 export const useCreateTaskMutation = () => {
 	const queryClient = useQueryClient();
@@ -46,6 +45,15 @@ export const useGetCommentsByTaskIdQuery = (taskId: string) => {
 		queryKey: ["comments", taskId],
 		queryFn: () => fetchData(`/tasks/${taskId}/comments`),
 		enabled: !!taskId,
+		staleTime: 1000 * 60 * 5, // 5 minutes
+		refetchOnWindowFocus: true,
+	});
+};
+
+export const useGetMyTasksQuery = () => {
+	return useQuery({
+		queryKey: ["my-tasks", "user"],
+		queryFn: () => fetchData("/tasks/my-tasks"),
 		staleTime: 1000 * 60 * 5, // 5 minutes
 		refetchOnWindowFocus: true,
 	});
