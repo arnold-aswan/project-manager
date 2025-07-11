@@ -14,7 +14,8 @@ export const useGetWorkspaces = () => {
 	return useQuery({
 		queryKey: ["workspaces"],
 		queryFn: async () => fetchData("/workspaces"),
-		staleTime: 60 * 60 * 10,
+		staleTime: 1000 * 60 * 5, // 5 minutes
+		refetchOnWindowFocus: true,
 	});
 };
 
@@ -22,6 +23,18 @@ export const useGetWorkspaceQuery = (workspaceId: string) => {
 	return useQuery<{ workspace: Workspace; projects: Project[] }>({
 		queryKey: ["workspace", workspaceId],
 		queryFn: async () => fetchData(`/workspaces/${workspaceId}/projects`),
-		staleTime: 60 * 60 * 10,
+		enabled: !!workspaceId,
+		staleTime: 1000 * 60 * 5, // 5 minutes
+		refetchOnWindowFocus: true,
+	});
+};
+
+export const useGetWorkspaceStatsQuery = (workspaceId: string) => {
+	return useQuery({
+		queryKey: ["workspace", workspaceId, "stats"],
+		queryFn: async () => fetchData(`/workspaces/${workspaceId}/stats`),
+		enabled: !!workspaceId,
+		staleTime: 1000 * 60 * 5, // 5 minutes
+		refetchOnWindowFocus: true,
 	});
 };

@@ -2,6 +2,7 @@ export {
 	ArrowLeft,
 	CheckCircle,
 	XCircle,
+	Circle,
 	Loader2,
 	Bell,
 	PlusCircle,
@@ -32,4 +33,9 @@ export {
 	MessageSquare,
 	Upload,
 	UserMinus,
+	ChartBarBig,
+	ChartLine,
+	ChartPie,
+	FilterIcon,
+	ArrowUpRight,
 } from "lucide-react";
