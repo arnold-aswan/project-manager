@@ -79,6 +79,11 @@ const taskSchema = z.object({
 	projectId: z.string().min(1, "Project ID is required"),
 });
 
+const inviteMemberSchema = z.object({
+	email: z.string().email("invalid email address"),
+	role: z.enum(["manager", "contributor", "viewer"]),
+});
+
 export {
 	registerSchema,
 	loginSchema,
@@ -88,4 +93,5 @@ export {
 	workspaceSchema,
 	projectSchema,
 	taskSchema,
+	inviteMemberSchema,
 };
