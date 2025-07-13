@@ -103,7 +103,7 @@ const MyTasks = () => {
 
 	if (isPending) <Loader />;
 	return (
-		<div className="space-y-6">
+		<section className="space-y-6">
 			<div className="flex items-start md:items-center justify-between">
 				<h1 className="text-2xl font-bold">My Tasks</h1>
 
@@ -419,7 +419,7 @@ const MyTasks = () => {
 					</div>
 				</TabsContent>
 			</Tabs>
-		</div>
+		</section>
 	);
 };
 

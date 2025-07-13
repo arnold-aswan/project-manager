@@ -38,3 +38,13 @@ export const useGetWorkspaceStatsQuery = (workspaceId: string) => {
 		refetchOnWindowFocus: true,
 	});
 };
+
+export const useGetWorkspaceDetailsQuery = (workspaceId: string) => {
+	return useQuery({
+		queryKey: ["workspace", workspaceId, "details"],
+		queryFn: async () => fetchData(`/workspaces/${workspaceId}`),
+		enabled: !!workspaceId,
+		staleTime: 1000 * 60 * 5, // 5 minutes
+		refetchOnWindowFocus: true,
+	});
+};
