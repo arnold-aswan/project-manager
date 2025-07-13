@@ -606,7 +606,6 @@ const myTasks = async (req: Request, res: Response) => {
 		const myTasks = await Task.find({ assignees: { $in: [user.userId] } })
 			.populate("project", "title workspace")
 			.sort({ createdAt: -1 });
-		console.log(myTasks);
 		res.status(200).json(myTasks);
 		return;
 	} catch (error) {
