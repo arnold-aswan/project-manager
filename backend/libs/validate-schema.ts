@@ -81,7 +81,7 @@ const taskSchema = z.object({
 
 const inviteMemberSchema = z.object({
 	email: z.string().email("invalid email address"),
-	role: z.enum(["manager", "contributor", "viewer"]),
+	role: z.enum(["admin", "member", "viewer"]),
 });
 
 export {
