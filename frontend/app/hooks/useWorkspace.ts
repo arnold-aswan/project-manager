@@ -1,3 +1,4 @@
+import type { InviteMemberFormData } from "@/components/modals/InviteMemberDialog";
 import type { WorkspaceFormData } from "@/components/workspace/create-workspace";
 import { fetchData, postData } from "@/lib/fetch-utils";
 import type { Project, Workspace } from "@/types";
@@ -46,5 +47,33 @@ export const useGetWorkspaceDetailsQuery = (workspaceId: string) => {
 		enabled: !!workspaceId,
 		staleTime: 1000 * 60 * 5, // 5 minutes
 		refetchOnWindowFocus: true,
+	});
+};
+
+export const useInviteMemberMutation = () => {
+	return useMutation({
+		mutationFn: async (data: {
+			email: string;
+			role: string;
+			workspaceId: string;
+		}) => {
+			postData(`/workspaces/${data.workspaceId}/invite-member`, data);
+		},
+	});
+};
+
+export const useAcceptInviteByTokenMutation = () => {
+	return useMutation({
+		mutationFn: (token: string) =>
+			postData(`/workspaces/accept-invite-token`, {
+				token,
+			}),
+	});
+};
+
+export const useAcceptGenerateInviteMutation = () => {
+	return useMutation({
+		mutationFn: (workspaceId: string) =>
+			postData(`/workspaces/${workspaceId}/accept-generate-invite`, {}),
 	});
 };
