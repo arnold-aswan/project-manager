@@ -16,7 +16,7 @@ export const signUpSchema = z
 		email: z.string().email({ message: "Invalid email address" }),
 		password: z
 			.string()
-			.min(8, { message: "Password must be at least 6 characters long" }),
+			.min(8, { message: "Password must be at least 8 characters long" }),
 		confirmPassword: z
 			.string()
 			.min(8, { message: "Confirm password is required" }),
@@ -76,3 +76,35 @@ export const taskSchema = z.object({
 	dueDate: z.string().min(1, "Due date is required"),
 	projectId: z.string().min(1, "Project ID is required"),
 });
+
+export const inviteMemberSchema = z.object({
+	email: z.string().email(),
+	role: z.enum(["admin", "member", "viewer"]),
+});
+
+export const changePasswordSchema = z
+	.object({
+		currentPassword: z
+			.string()
+			.min(8, { message: "Password must be at least 8 characters long" }),
+		newPassword: z
+			.string()
+			.min(8, { message: "Password must be at least 8 characters long" }),
+		confirmPassword: z
+			.string()
+			.min(8, { message: "Confirm password is required" }),
+	})
+	.refine((data) => data.newPassword === data.confirmPassword, {
+		message: "Passwords do not match!",
+		path: ["confirmPassword"],
+	});
+
+export const profileSchema = z.object({
+	fullname: z
+		.string()
+		.min(5, { message: "Full name must be at least 5 characters long" }),
+	avatar: z.string().optional(),
+});
+
+export type ChangePasswordFormData = z.infer<typeof changePasswordSchema>;
+export type ProfileFormData = z.infer<typeof profileSchema>;
