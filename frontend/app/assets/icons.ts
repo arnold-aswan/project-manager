@@ -38,4 +38,8 @@ export {
 	ChartPie,
 	FilterIcon,
 	ArrowUpRight,
+	Check,
+	Copy,
+	Mail,
+	AlertCircle,
 } from "lucide-react";
