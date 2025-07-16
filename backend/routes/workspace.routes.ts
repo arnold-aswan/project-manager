@@ -11,6 +11,9 @@ import {
 	acceptTokenInvite,
 	inviteMemberToWorkspace,
 	acceptGenerateInvitation,
+	updateWorkspace,
+	deleteWorkspace,
+	transferWorkspaceOwnership,
 } from "../controllers/workspace.controller";
 import { z } from "zod";
 
@@ -49,6 +52,37 @@ router.post(
 		params: z.object({ workspaceId: z.string() }),
 	}),
 	acceptGenerateInvitation
+);
+
+// PUT
+router.put(
+	"/:workspaceId/update-workspace",
+	authMiddleware,
+	validateRequest({
+		params: z.object({ workspaceId: z.string() }),
+		body: workspaceSchema,
+	}),
+	updateWorkspace
+);
+
+router.put(
+	"/:workspaceId/transfer-workspace-ownership",
+	authMiddleware,
+	validateRequest({
+		params: z.object({ workspaceId: z.string() }),
+		body: z.object({ newOwnerId: z.string() }),
+	}),
+	transferWorkspaceOwnership
+);
+
+// DELETE
+router.delete(
+	"/:workspaceId/delete-workspace",
+	authMiddleware,
+	validateRequest({
+		params: z.object({ workspaceId: z.string() }),
+	}),
+	deleteWorkspace
 );
 
 router.get("/", authMiddleware, getWorkspaces);

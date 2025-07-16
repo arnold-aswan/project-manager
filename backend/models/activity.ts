@@ -21,6 +21,7 @@ const activitySchema = new Schema(
 				"completed_project",
 				"created_workspace",
 				"updated_workspace",
+				"removed_workspace",
 				"added_comment",
 				"added_member",
 				"removed_member",

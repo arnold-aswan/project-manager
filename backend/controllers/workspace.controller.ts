@@ -578,6 +578,168 @@ const acceptGenerateInvitation = async (req: Request, res: Response) => {
 	}
 };
 
+const updateWorkspace = async (req: Request, res: Response) => {
+	try {
+		const { workspaceId } = req.params;
+		const { name, description, color } = req.body;
+
+		const workspace = await Workspace.findById(workspaceId);
+		if (!workspace) {
+			res.status(404).json({ message: "Workspace not found!" });
+			return;
+		}
+
+		const user = await getUser(req, res);
+		if (!user) return;
+
+		const member = workspace.members.find(
+			(member) => String(member.user) === String(user.userId)
+		);
+		if (!member) {
+			res
+				.status(403)
+				.json({ message: "You are not a member of this workspace!" });
+			return;
+		}
+		if (member.role !== "owner") {
+			res
+				.status(403)
+				.json({ message: "Only the workspace owner can update it's details!" });
+		}
+
+		workspace.name = name;
+		workspace.description = description;
+		workspace.color = color;
+		await workspace.save();
+
+		logActivity(user.userId, "updated_workspace", "Workspace", workspaceId, {
+			description: "Workspace details update.",
+		});
+
+		res
+			.status(200)
+			.json({ message: "Updated workspace details successfully.", workspace });
+		return;
+	} catch (error) {
+		console.error("Error updating workspace::", error);
+		res.status(500).json({ message: "Internal server error" });
+		return;
+	}
+};
+
+const deleteWorkspace = async (req: Request, res: Response) => {
+	try {
+		const { workspaceId } = req.params;
+
+		const workspace = await Workspace.findById(workspaceId);
+		if (!workspace) {
+			res.status(400).json({ message: "Workspace not found!" });
+			return;
+		}
+
+		const user = await getUser(req, res);
+		if (!user) return;
+
+		const member = workspace.members.find(
+			(member) => String(member.user) === String(user.userId)
+		);
+		if (!member) {
+			res
+				.status(403)
+				.json({ message: "you are not a member of this workspace!" });
+			return;
+		}
+		if (member.role !== "owner") {
+			res.status(403).json({
+				message: "Only the workspace owner can delete a workspace! ",
+			});
+			return;
+		}
+
+		await workspace.deleteOne();
+
+		logActivity(user.userId, "removed_workspace", "Workspace", workspaceId, {
+			description: "Workspace deleted.",
+		});
+		res.status(200).json({ message: "Workspace deleted successfully." });
+		return;
+	} catch (error) {
+		console.error("Error deleting workspace::", error);
+		res.status(500).json({ message: "Internal server error" });
+		return;
+	}
+};
+
+const transferWorkspaceOwnership = async (req: Request, res: Response) => {
+	try {
+		const { workspaceId } = req.params;
+		const { newOwnerId } = req.body;
+
+		const workspace = await Workspace.findById(workspaceId);
+		if (!workspace) {
+			res.status(400).json({ message: "Workspace not found!" });
+			return;
+		}
+
+		const user = await getUser(req, res);
+		if (!user) return;
+
+		const member = workspace.members.find(
+			(member) => String(member.user) === String(user.userId)
+		);
+		if (!member) {
+			res
+				.status(403)
+				.json({ message: "You are not a member of this workspace!" });
+			return;
+		}
+		const newOwnerIsMember = workspace.members.find(
+			(member) => String(member.user) === String(newOwnerId)
+		);
+		if (!newOwnerIsMember) {
+			res
+				.status(403)
+				.json({ message: "This user is not a member of this workspace!" });
+			return;
+		}
+		if (member.role !== "owner") {
+			res.status(403).json({
+				message: "Only the workspace owner can transfer workspace ownership! ",
+			});
+			return;
+		}
+		if (newOwnerIsMember.role === "owner") {
+			res.status(403).json({
+				message: "This user is already the owner of this workspace! ",
+			});
+			return;
+		}
+
+		workspace.owner = newOwnerIsMember._id;
+		await workspace.save();
+
+		logActivity(
+			user.userId,
+			"transferred_workspace_ownership",
+			"Workspace",
+			workspaceId,
+			{
+				description: `Workspace ownership transfer`,
+			}
+		);
+
+		res.status(200).json({
+			message: "Transferred workspace ownership successfully.",
+			workspace,
+		});
+		return;
+	} catch (error) {
+		console.error("Error transferring workspace ownership::", error);
+		res.status(500).json({ message: "Internal server error" });
+		return;
+	}
+};
+
 export {
 	createWorkspace,
 	getWorkspaces,
@@ -587,4 +749,7 @@ export {
 	acceptTokenInvite,
 	inviteMemberToWorkspace,
 	acceptGenerateInvitation,
+	updateWorkspace,
+	deleteWorkspace,
+	transferWorkspaceOwnership,
 };
