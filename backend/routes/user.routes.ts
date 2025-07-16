@@ -30,7 +30,7 @@ router.put(
 	validateRequest({
 		body: z.object({
 			currentPassword: z.string(),
-			newtPassword: z.string(),
+			newPassword: z.string(),
 			confirmPassword: z.string(),
 		}),
 	}),
