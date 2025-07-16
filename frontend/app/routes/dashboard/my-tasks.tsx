@@ -99,8 +99,6 @@ const MyTasks = () => {
 	);
 	const doneTasks = sortedTasks.filter((task) => task.status === "Done");
 
-	console.log(myTasks);
-
 	if (isPending) <Loader />;
 	return (
 		<section className="space-y-6">

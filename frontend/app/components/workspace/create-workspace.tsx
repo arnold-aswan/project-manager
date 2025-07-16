@@ -26,7 +26,7 @@ const CreateWorkspace = ({
 	isCreatingWorkspace,
 	setIsCreatingWorkspace,
 }: CreateWorkspaceProps) => {
-	const { mutate, isPending, isSuccess } = useCreateWorkspace();
+	const { mutate, isPending } = useCreateWorkspace();
 	const navigate = useNavigate();
 
 	const form = useForm<WorkspaceFormData>({

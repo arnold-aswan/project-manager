@@ -1,4 +1,4 @@
-import { Loader2 } from "@/assets/icons";
+import { Loader as Loader2 } from "@/assets/icons";
 
 const Loader = () => {
 	return (

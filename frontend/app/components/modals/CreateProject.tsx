@@ -58,7 +58,7 @@ const CreateProject = ({
 		},
 	});
 
-	const { mutate, isPending, isSuccess } = useCreateProject();
+	const { mutate, isPending } = useCreateProject();
 
 	const onSubmit = (data: CreateProjectFormData) => {
 		if (!workspaceId) return;

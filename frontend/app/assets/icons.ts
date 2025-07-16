@@ -3,6 +3,7 @@ export {
 	CheckCircle,
 	XCircle,
 	Circle,
+	Loader,
 	Loader2,
 	Bell,
 	PlusCircle,
