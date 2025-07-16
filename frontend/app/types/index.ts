@@ -139,6 +139,19 @@ export interface CreateWorkspaceProps {
 	setIsCreatingWorkspace: (isCreatingWorkSpace: boolean) => void;
 }
 
+export interface DeleteWorkspaceProps {
+	workspaceId: string;
+	isDeletingWorkspace: boolean;
+	setIsDeletingWorkspace: (isDeletingWorkspace: boolean) => void;
+}
+
+export interface TransferWorkspaceProps {
+	workspaceId: string;
+	workspaceMembers: MemberProps[];
+	isTransferringWorkspace: boolean;
+	setIsTransferringWorkspace: (iTransferringWorkspace: boolean) => void;
+}
+
 export interface ProjectCardProps {
 	project: Project;
 	progress: Number;

@@ -1,8 +1,8 @@
 import type { InviteMemberFormData } from "@/components/modals/InviteMemberDialog";
 import type { WorkspaceFormData } from "@/components/workspace/create-workspace";
-import { fetchData, postData } from "@/lib/fetch-utils";
+import { deleteData, fetchData, postData, updateData } from "@/lib/fetch-utils";
 import type { Project, Workspace } from "@/types";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export const useCreateWorkspace = () => {
 	return useMutation({
@@ -75,5 +75,56 @@ export const useAcceptGenerateInviteMutation = () => {
 	return useMutation({
 		mutationFn: (workspaceId: string) =>
 			postData(`/workspaces/${workspaceId}/accept-generate-invite`, {}),
+	});
+};
+
+export const useUpdateWorkspaceDetailsMutation = () => {
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: async (data: {
+			workspaceData: WorkspaceFormData;
+			workspaceId: string;
+		}) => {
+			return updateData(
+				`/workspaces/${data.workspaceId}/update-workspace`,
+				data.workspaceData
+			);
+		},
+		onSuccess: (data: any) => {
+			queryClient.invalidateQueries({
+				queryKey: ["workspace", data.workspace],
+			});
+		},
+	});
+};
+
+export const useDeleteWorkspaceMutation = () => {
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: async (workspaceId: string) => {
+			return deleteData(`/workspaces/${workspaceId}/delete-workspace`);
+		},
+		onSuccess: (data: any) => {
+			queryClient.invalidateQueries({
+				queryKey: ["workspaces"],
+			});
+		},
+	});
+};
+
+export const useTransferWorkspaceOwnershipMutation = () => {
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: async (data: { newOwnerId: string; workspaceId: string }) => {
+			return updateData(
+				`/workspaces/${data.workspaceId}/transfer-workspace-ownership`,
+				data
+			);
+		},
+		onSuccess: (data: any) => {
+			queryClient.invalidateQueries({
+				queryKey: ["workspace", data.workspace],
+			});
+		},
 	});
 };
