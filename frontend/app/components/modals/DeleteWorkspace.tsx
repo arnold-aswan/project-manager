@@ -28,7 +28,7 @@ const DeleteWorkspace = ({
 				navigate("/workspaces");
 			},
 			onError: (error: any) => {
-				toast.error("Uh oh, failed to update workspace details.");
+				toast.error("Uh oh, failed to delete workspace.");
 				console.error(error);
 			},
 		});

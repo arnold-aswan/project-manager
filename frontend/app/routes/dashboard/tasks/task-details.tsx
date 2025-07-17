@@ -74,7 +74,7 @@ const TaskDetails = () => {
 					toast.success(data.message);
 				},
 				onError: (error: any) => {
-					toast.error("Failed to watch task.");
+					toast.error("Failed to archive task.");
 					console.error(error);
 				},
 			}
