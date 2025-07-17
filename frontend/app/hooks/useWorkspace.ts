@@ -108,6 +108,9 @@ export const useDeleteWorkspaceMutation = () => {
 			queryClient.invalidateQueries({
 				queryKey: ["workspaces"],
 			});
+			queryClient.invalidateQueries({
+				queryKey: ["workspace", data.workspaceId],
+			});
 		},
 	});
 };

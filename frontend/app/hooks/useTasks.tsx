@@ -143,6 +143,9 @@ export const useUpdateTaskAssigneesMutation = () => {
 			queryClient.invalidateQueries({
 				queryKey: ["task-activity", taskId],
 			});
+			queryClient.invalidateQueries({
+				queryKey: ["my-tasks"],
+			});
 		},
 	});
 };
