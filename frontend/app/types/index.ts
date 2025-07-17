@@ -51,6 +51,7 @@ export interface Project {
 	tags?: string[];
 	createdBy: User;
 	isArchived: boolean;
+	updatedAt?: Date;
 }
 
 export enum ProjectStatus {

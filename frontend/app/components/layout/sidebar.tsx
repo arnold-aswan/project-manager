@@ -2,10 +2,12 @@ import useAuthStore from "@/stores/authstore";
 import type { Workspace } from "@/types";
 import { useState } from "react";
 import {
+	Boxes,
 	CheckCircle2,
 	ChevronsLeft,
 	ChevronsRight,
 	LayoutDashboard,
+	LayoutGrid,
 	ListCheck,
 	LogOut,
 	Settings,
@@ -23,7 +25,7 @@ const Sidebar = ({
 }: {
 	currentWorkspace: Workspace | null;
 }) => {
-	const { user, logout } = useAuthStore.getState();
+	const { logout } = useAuthStore.getState();
 	const [isCollapsed, setIsCollapsed] = useState(false);
 
 	const navItems = [
@@ -35,7 +37,7 @@ const Sidebar = ({
 		{
 			title: "workspaces",
 			href: "/workspaces",
-			icon: Users,
+			icon: Boxes,
 		},
 		{
 			title: "my tasks",
@@ -48,8 +50,8 @@ const Sidebar = ({
 			icon: Users,
 		},
 		{
-			title: "achieved",
-			href: "/achieved",
+			title: "archived",
+			href: "/archived",
 			icon: CheckCircle2,
 		},
 		{

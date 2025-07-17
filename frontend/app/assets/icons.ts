@@ -43,4 +43,5 @@ export {
 	Copy,
 	Mail,
 	AlertCircle,
+	Boxes,
 } from "lucide-react";
