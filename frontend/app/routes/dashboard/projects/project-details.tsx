@@ -6,11 +6,15 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useGetProjectsQuery } from "@/hooks/useProjects";
+import {
+	useArchiveProjectMutation,
+	useGetProjectsQuery,
+} from "@/hooks/useProjects";
 import { getProjectProgress } from "@/lib";
 import type { Project, Task, TaskStatusFilter } from "@/types";
-import React, { useState } from "react";
+import { useState } from "react";
 import { useNavigate, useParams } from "react-router";
+import { toast } from "sonner";
 
 const ProjectDetails = () => {
 	const { projectId, workspaceId } = useParams<{
@@ -18,16 +22,18 @@ const ProjectDetails = () => {
 		workspaceId: string;
 	}>();
 	const navigate = useNavigate();
+	if (!projectId && workspaceId) return <div>No project found!</div>;
 
 	const [isCreateTask, setIsCreateTask] = useState(false);
 	const [taskFilter, setTaskFilter] = useState<TaskStatusFilter | "All">("All");
-
-	if (!projectId && workspaceId) return <div>No project found!</div>;
 
 	const { data, isPending } = useGetProjectsQuery(projectId!) as {
 		data: { project: Project; tasks: Task[] };
 		isPending: boolean;
 	};
+
+	const { mutate: archiveTaskMutate, isPending: isArchiving } =
+		useArchiveProjectMutation();
 
 	const projectProgress = getProjectProgress(
 		(data?.tasks || []).map((task) => ({
@@ -49,6 +55,21 @@ const ProjectDetails = () => {
 		{ value: "done", label: "Done", status: "Done" },
 	];
 
+	const handleArchive = () => {
+		archiveTaskMutate(
+			{ projectId: projectId! },
+			{
+				onSuccess: (data: any) => {
+					toast.success(data.message);
+				},
+				onError: (error: any) => {
+					toast.error("Failed to archive task.");
+					console.error(error);
+				},
+			}
+		);
+	};
+
 	if (isPending) return <Loader />;
 	if (!data || !data.project) {
 		return <div>No project found!</div>;
@@ -63,6 +84,14 @@ const ProjectDetails = () => {
 						<h1 className="text-xl md:text-2xl font-bold">
 							{data?.project?.title}
 						</h1>
+						{data?.project?.isArchived && (
+							<Badge
+								variant="outline"
+								className="ml-2"
+							>
+								Achieved
+							</Badge>
+						)}
 					</div>
 					{data?.project?.description && (
 						<p className="text-sm text-gray-500">
@@ -84,6 +113,16 @@ const ProjectDetails = () => {
 							{projectProgress}%
 						</span>
 					</div>
+
+					<Button
+						variant={"outline"}
+						size={"sm"}
+						onClick={handleArchive}
+						className="w-fit"
+						disabled={isArchiving}
+					>
+						{data?.project?.isArchived ? "Unarchive" : "Archive"}
+					</Button>
 
 					<Button onClick={() => setIsCreateTask(true)}>Create Task</Button>
 				</div>
