@@ -3,6 +3,7 @@ import Workspace from "../models/workspace";
 import { getUser } from "./workspace.controller";
 import Project from "../models/projects";
 import Task from "../models/task";
+import { logActivity } from "../libs";
 
 const createProject = async (req: Request, res: Response) => {
 	try {
@@ -47,6 +48,16 @@ const createProject = async (req: Request, res: Response) => {
 		workspace.projects.push(newProject._id);
 		await workspace.save();
 
+		logActivity(
+			user.userId,
+			"created_project",
+			"Project",
+			String(newProject._id),
+			{
+				description: `Created new project titled ${title}.`,
+			}
+		);
+
 		res.status(201).json(newProject);
 		return;
 	} catch (error) {
@@ -79,7 +90,6 @@ const getProjectDetails = async (req: Request, res: Response) => {
 		}
 
 		res.status(200).json(project);
-		console.log("Project details retrieved successfully::", project);
 		return;
 	} catch (error) {
 		console.error("Error getting project details::", error);
@@ -128,4 +138,92 @@ const getProjectTasks = async (req: Request, res: Response) => {
 	}
 };
 
-export { createProject, getProjectDetails, getProjectTasks };
+const getArchivedProjectsAndTasks = async (req: Request, res: Response) => {
+	try {
+		const { workspaceId } = req.params;
+
+		const user = await getUser(req, res);
+		if (!user) return;
+
+		const allUserProjects = await Project.find({
+			workspace: workspaceId,
+			"members.user": user.userId,
+		});
+		if (!allUserProjects) {
+			res.status(400).json({ message: "No archived projects found!" });
+			return;
+		}
+
+		const archivedProjects = allUserProjects.filter(
+			(projects) => projects.isArchived
+		);
+		// get all project ids
+		const projectIds = allUserProjects.map((project) => project._id);
+
+		// get archived tasks
+		const archivedTasks = await Task.find({
+			project: { $in: projectIds },
+			isArchived: true,
+		}).populate("project", "title");
+
+		res.status(200).json({ archivedProjects, archivedTasks });
+		return;
+	} catch (error) {
+		console.error("Error getting archived projects::", error);
+		res.status(500).json({ message: "Internal server error" });
+		return;
+	}
+};
+
+const archiveProject = async (req: Request, res: Response) => {
+	try {
+		const { projectId } = req.params;
+
+		const project = await Project.findById(projectId);
+		if (!project) {
+			res.status(404).json({ message: "Project not found!" });
+			return;
+		}
+
+		const user = await getUser(req, res);
+		if (!user) return;
+
+		const isMember = project.members.some(
+			(member) => String(member.user) === String(user.userId)
+		);
+		if (!isMember) {
+			res.status(403).json({ message: "You are not a member of this project" });
+			return;
+		}
+
+		const isProjectArchived = project.isArchived;
+		project.isArchived = !isProjectArchived;
+		await project.save();
+
+		logActivity(user.userId, "updated_project", "Project", projectId, {
+			description: `${
+				isProjectArchived ? "Unarchive project." : "Archived project."
+			}`,
+		});
+
+		res.status(200).json({
+			message: `${
+				isProjectArchived ? "Unarchive project." : "Archived project."
+			}`,
+			project,
+		});
+		return;
+	} catch (error) {
+		console.error("Error archiving task::", error);
+		res.status(500).json({ message: "Internal server error" });
+		return;
+	}
+};
+
+export {
+	createProject,
+	getProjectDetails,
+	getProjectTasks,
+	getArchivedProjectsAndTasks,
+	archiveProject,
+};

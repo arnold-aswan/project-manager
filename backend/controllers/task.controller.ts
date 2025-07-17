@@ -53,6 +53,10 @@ const createTask = async (req: Request, res: Response) => {
 		project.tasks.push(newTask._id);
 		await project.save();
 
+		logActivity(user.userId, "created_task", "Task", String(newTask._id), {
+			description: `Created new task titled ${title}.`,
+		});
+
 		res.status(201).json(newTask);
 		return;
 	} catch (error) {
