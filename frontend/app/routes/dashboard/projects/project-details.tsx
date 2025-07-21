@@ -1,7 +1,6 @@
 import CreateTaskDialog from "@/components/modals/CreateTask";
 import BackButton from "@/components/shared/back-button";
 import Loader from "@/components/shared/loader";
-import TaskColumn from "@/components/tasks/TaskColumn";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -10,22 +9,41 @@ import {
 	useArchiveProjectMutation,
 	useGetProjectsQuery,
 } from "@/hooks/useProjects";
-import { getProjectProgress } from "@/lib";
+import {
+	getProjectProgress,
+	getTaskPriorityColor,
+	taskStatusColor,
+} from "@/lib";
 import type { Project, Task, TaskStatusFilter } from "@/types";
-import { useState } from "react";
-import { useNavigate, useParams } from "react-router";
+import { useEffect, useState } from "react";
+import { Link, useParams } from "react-router";
 import { toast } from "sonner";
+
+import Kanban from "@/components/tasks/Kanban";
+import {
+	Table,
+	TableBody,
+	TableCaption,
+	TableCell,
+	TableHead,
+	TableHeader,
+	TableRow,
+} from "@/components/ui/table";
+
+import { format } from "date-fns";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { cn } from "@/lib/utils";
+import { Eye } from "@/assets/icons";
 
 const ProjectDetails = () => {
 	const { projectId, workspaceId } = useParams<{
 		projectId: string;
 		workspaceId: string;
 	}>();
-	const navigate = useNavigate();
 	if (!projectId && workspaceId) return <div>No project found!</div>;
 
 	const [isCreateTask, setIsCreateTask] = useState(false);
-	const [taskFilter, setTaskFilter] = useState<TaskStatusFilter | "All">("All");
+	const [kanbanTasks, setKanbanTasks] = useState<Task[]>([]);
 
 	const { data, isPending } = useGetProjectsQuery(projectId!) as {
 		data: { project: Project; tasks: Task[] };
@@ -35,21 +53,20 @@ const ProjectDetails = () => {
 	const { mutate: archiveTaskMutate, isPending: isArchiving } =
 		useArchiveProjectMutation();
 
+	useEffect(() => {
+		if (data?.tasks) {
+			setKanbanTasks(data.tasks);
+		}
+	}, [data?.tasks]);
+
 	const projectProgress = getProjectProgress(
 		(data?.tasks || []).map((task) => ({
 			status: task.status as TaskStatusFilter,
 		}))
 	);
 
-	const handleTaskClick = (taskId: string) => {
-		navigate(
-			`/workspaces/${workspaceId}/projects/${projectId}/tasks/${taskId}`
-		);
-	};
-
 	const statuses = ["To Do", "In Progress", "Done"];
 	const taskFilters = [
-		{ value: "all", label: "All Tasks", status: "All" },
 		{ value: "todo", label: "To Do", status: "To Do" },
 		{ value: "in-progress", label: "In Progress", status: "In Progress" },
 		{ value: "done", label: "Done", status: "Done" },
@@ -128,24 +145,15 @@ const ProjectDetails = () => {
 				</div>
 			</header>
 
-			<div className="flex items-center justify-between">
+			<main className="flex items-center justify-between">
 				<Tabs
-					defaultValue="all"
+					defaultValue="table"
 					className="w-full"
 				>
-					<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+					<div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-6">
 						<TabsList>
-							{taskFilters.map(({ value, label, status }) => (
-								<TabsTrigger
-									key={value}
-									value={value}
-									onClick={() =>
-										setTaskFilter(status as TaskStatusFilter | "All")
-									}
-								>
-									{label}
-								</TabsTrigger>
-							))}
+							<TabsTrigger value="table">Table</TabsTrigger>
+							<TabsTrigger value="kanban">Kanban</TabsTrigger>
 						</TabsList>
 
 						<div className="flex items-center text-sm">
@@ -170,74 +178,101 @@ const ProjectDetails = () => {
 					</div>
 
 					<TabsContent
-						value="all"
-						className="m-0"
+						value="table"
+						className="w-full max-w-full"
 					>
-						<div className="grid grid-cols-3 gap-4">
-							<TaskColumn
-								title="To Do"
-								tasks={data?.tasks.filter((task) => task.status === "To Do")}
-								onTaskClick={handleTaskClick}
-							/>
-
-							<TaskColumn
-								title="In Progress"
-								tasks={data?.tasks.filter(
-									(task) => task.status === "In Progress"
-								)}
-								onTaskClick={handleTaskClick}
-							/>
-
-							<TaskColumn
-								title="Done"
-								tasks={data?.tasks.filter((task) => task.status === "Done")}
-								onTaskClick={handleTaskClick}
-							/>
+						<div className="w-full max-w-full overflow-x-auto -mx-0">
+							{/* <div className="min-w-[640px] md:min-w-full border"> */}
+							<Table className="min-w-[640px] w-max border-collapse">
+								<TableCaption>A list of tasks.</TableCaption>
+								<TableHeader>
+									<TableRow>
+										<TableHead>Title</TableHead>
+										<TableHead>Status</TableHead>
+										<TableHead>Priority</TableHead>
+										<TableHead>Assignees</TableHead>
+										<TableHead>Sub Tasks</TableHead>
+										<TableHead>Due Date</TableHead>
+										<TableHead>Created At</TableHead>
+										<TableHead>Action</TableHead>
+									</TableRow>
+								</TableHeader>
+								<TableBody>
+									{data?.tasks?.map((task) => (
+										<TableRow key={task._id}>
+											<TableCell>{task.title}</TableCell>
+											<TableCell>
+												<Badge
+													className={cn(
+														taskStatusColor(task.status),
+														"rounded-full"
+													)}
+												>
+													{task.status}
+												</Badge>
+											</TableCell>
+											<TableCell>
+												<Badge
+													className={cn(
+														getTaskPriorityColor(task.priority),
+														"rounded-full"
+													)}
+												>
+													{task.priority}
+												</Badge>
+											</TableCell>
+											<TableCell>
+												{task?.assignees?.slice(0, 3)?.map((a) => (
+													<Avatar
+														key={a._id}
+														className="relative size-8 bg-gray-700 rounded-full border-2 border-background overflow-hidden "
+														title={a.fullname}
+													>
+														<AvatarImage
+															src={a.avatar}
+															alt={"avatar"}
+														/>
+														<AvatarFallback>
+															{a.fullname.charAt(0).toUpperCase()}
+														</AvatarFallback>
+													</Avatar>
+												))}
+											</TableCell>
+											<TableCell>
+												<Badge>{task.subTasks?.length}</Badge>
+											</TableCell>
+											<TableCell>{format(task.dueDate, "P")}</TableCell>
+											<TableCell>{format(task.createdAt, "P")}</TableCell>
+											<TableCell>
+												<Button variant={"outline"}>
+													<Link
+														to={`/workspaces/${workspaceId}/projects/${projectId}/tasks/${task._id}`}
+														className="flex items-center gap-1 "
+													>
+														<Eye />
+														View Task
+													</Link>
+												</Button>
+											</TableCell>
+										</TableRow>
+									))}
+								</TableBody>
+							</Table>
 						</div>
+						{/* // </div> */}
 					</TabsContent>
 
-					<TabsContent
-						value="todo"
-						className="m-0"
-					>
-						<div className="grid grid-cols-3 gap-4">
-							<TaskColumn
-								title="To Do"
-								tasks={data?.tasks.filter((task) => task.status === "To Do")}
-								onTaskClick={handleTaskClick}
-							/>
-						</div>
-					</TabsContent>
-
-					<TabsContent
-						value="in-progress"
-						className="m-0"
-					>
-						<div className="grid grid-cols-3 gap-4">
-							<TaskColumn
-								title="In Progress"
-								tasks={data?.tasks.filter(
-									(task) => task.status === "In Progress"
-								)}
-								onTaskClick={handleTaskClick}
-							/>
-						</div>
-					</TabsContent>
-
-					<TabsContent
-						value="done"
-						className="m-0"
-					>
-						<div className="grid grid-cols-3 gap-4">
-							<TaskColumn
-								title="Done"
-								tasks={data?.tasks.filter((task) => task.status === "Done")}
-								onTaskClick={handleTaskClick}
-							/>
-						</div>
+					<TabsContent value="kanban">
+						<Kanban
+							stages={taskFilters}
+							tasks={kanbanTasks}
+							projectId={projectId || ""}
+							workspaceId={workspaceId || ""}
+							setTasks={setKanbanTasks}
+						/>
 					</TabsContent>
 				</Tabs>
-			</div>
+			</main>
 
 			{/* Add task modal */}
 			<CreateTaskDialog

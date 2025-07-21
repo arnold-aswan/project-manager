@@ -93,3 +93,29 @@ export const getTaskPriorityVariant = (priority: string) => {
 			return "outline";
 	}
 };
+
+export const borderColor = (status: string) => {
+	switch (status.toLowerCase()) {
+		case "to do":
+			return " border-blue-400 ";
+		case "in progress":
+			return " border-amber-400 ";
+		case "done":
+			return " border-green-400 ";
+		default:
+			return " border-purple-400 ";
+	}
+};
+
+export const taskStatusColor = (status: string) => {
+	switch (status.toLowerCase()) {
+		case "to do":
+			return " bg-blue-400 ";
+		case "in progress":
+			return " bg-amber-400 ";
+		case "done":
+			return " bg-green-400 ";
+		default:
+			return " bg-purple-400 ";
+	}
+};

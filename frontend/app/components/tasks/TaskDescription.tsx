@@ -38,7 +38,7 @@ const TaskDescription = ({
 					setIsEditing(false);
 					const errorMsg = error?.response?.data?.message;
 					toast.error("Failed to update task title");
-					console.log(errorMsg);
+					console.error(errorMsg);
 				},
 			}
 		);

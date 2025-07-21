@@ -4,6 +4,7 @@ import { Badge } from "../ui/badge";
 import TaskCard from "../cards/TaskCard";
 
 interface TaskColumnProps {
+	id: string;
 	title: string;
 	tasks: Task[];
 	onTaskClick: (taskId: string) => void;
@@ -11,6 +12,7 @@ interface TaskColumnProps {
 }
 
 const TaskColumn = ({
+	id,
 	title,
 	tasks,
 	onTaskClick,

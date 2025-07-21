@@ -130,7 +130,7 @@ export interface HeaderProps {
 
 export interface SidebarNavProps {
 	items: SidebarNavItems[];
-	isCollapsed: boolean;
+	isOpen: boolean;
 	className: string;
 	currentWorkspace: Workspace | null;
 }
