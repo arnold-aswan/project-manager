@@ -52,7 +52,6 @@ const WorkspaceInvite = () => {
 				},
 				onError: (error: any) => {
 					toast.error(error.response.data.message);
-					console.log(error);
 				},
 			});
 		} else {
@@ -63,7 +62,6 @@ const WorkspaceInvite = () => {
 				},
 				onError: (error: any) => {
 					toast.error(error.response.data.message);
-					console.log(error);
 				},
 			});
 		}

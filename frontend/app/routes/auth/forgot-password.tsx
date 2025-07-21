@@ -31,7 +31,6 @@ const ForgotPassword = () => {
 	});
 
 	const onSubmit = (data: ForgotPasswordRequestFormData) => {
-		console.log(data);
 		mutate(data, {
 			onSuccess: () => {
 				toast.success("A password reset link has been sent to your email.");

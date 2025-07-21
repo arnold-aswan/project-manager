@@ -31,7 +31,6 @@ const Dashboard = () => {
 		};
 		isPending: boolean;
 	};
-	console.log(data);
 
 	if (isPending) return <Loader />;
 

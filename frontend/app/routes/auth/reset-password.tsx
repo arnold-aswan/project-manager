@@ -40,7 +40,6 @@ const ResetPassword = () => {
 			onError: (error: any) => {
 				const errorMsg = "Token expired. Request for a new one.";
 				toast.error(errorMsg);
-				console.log(error);
 			},
 		});
 	};

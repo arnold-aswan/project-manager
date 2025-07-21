@@ -35,7 +35,6 @@ const SignUp = () => {
 	const { mutate, isPending } = useSignUpMutation();
 
 	const handleSubmit = (data: SignUpFormData) => {
-		console.log(data);
 		mutate(data, {
 			onSuccess: () => {
 				toast.success("Email verification required", {

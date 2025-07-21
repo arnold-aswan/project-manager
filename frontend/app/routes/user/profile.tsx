@@ -105,7 +105,6 @@ const Profile = () => {
 					const errorMessage =
 						error.response?.data?.error || "Failed to update profile";
 					toast.error(errorMessage);
-					console.log(error);
 				},
 			}
 		);

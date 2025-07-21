@@ -1,4 +1,3 @@
-import React from "react";
 import type { Task } from "@/types";
 import { Card, CardContent, CardHeader } from "../ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
@@ -12,7 +11,7 @@ const TaskCard = ({ task, onClick }: { task: Task; onClick: () => void }) => {
 	return (
 		<Card
 			onClick={onClick}
-			className="cursor-pointer hover:shadow-md transition-all duration-300 hover:translate-y-1 "
+			className={`cursor-pointer hover:shadow-md transition-all duration-300 hover:-translate-y-1 `}
 		>
 			<CardHeader>
 				<article className="flex items-center justify-between">
@@ -26,9 +25,9 @@ const TaskCard = ({ task, onClick }: { task: Task; onClick: () => void }) => {
 								variant={"ghost"}
 								size={"icon"}
 								className="size-6"
-								onClick={() => {
-									console.log("mark as to do");
-								}}
+								// onClick={() => {
+								// 	console.log("mark as to do");
+								// }}
 								title="Mark as To Do"
 							>
 								<CircleAlert className="size-4" />
@@ -40,9 +39,9 @@ const TaskCard = ({ task, onClick }: { task: Task; onClick: () => void }) => {
 								variant={"ghost"}
 								size={"icon"}
 								className="size-6"
-								onClick={() => {
-									console.log("mark as in progress");
-								}}
+								// onClick={() => {
+								// 	console.log("mark as in progress");
+								// }}
 								title="Mark as In Progress"
 							>
 								<Clock className="size-4" />
@@ -54,9 +53,9 @@ const TaskCard = ({ task, onClick }: { task: Task; onClick: () => void }) => {
 								variant={"ghost"}
 								size={"icon"}
 								className="size-6"
-								onClick={() => {
-									console.log("mark as done");
-								}}
+								// onClick={() => {
+								// 	console.log("mark as done");
+								// }}
 								title="Mark as Done"
 							>
 								<CheckCircle className="size-4" />
@@ -68,10 +67,10 @@ const TaskCard = ({ task, onClick }: { task: Task; onClick: () => void }) => {
 			</CardHeader>
 
 			<CardContent>
-				<h4 className="font-medium mb-2">{task?.title}</h4>
+				<h4 className="font-medium">{task?.title}</h4>
 
 				{task?.description && (
-					<p className="text-sm text-muted-foreground line-clamp-2 mb-2">
+					<p className="text-sm text-muted-foreground line-clamp-2">
 						{task?.description}
 					</p>
 				)}
@@ -106,19 +105,21 @@ const TaskCard = ({ task, onClick }: { task: Task; onClick: () => void }) => {
 					</div>
 				</article>
 
-				{task.dueDate && (
-					<div className="text-xs to-muted-foreground flex items-center mt-1">
-						<Calendar className="size-4 mr-1" />
-						<span>{dateFormatter(task.dueDate)}</span>
-					</div>
-				)}
+				<div className="flex items-center justify-between">
+					{task.dueDate && (
+						<div className="text-xs to-muted-foreground flex items-center mt-1">
+							<Calendar className="size-4 mr-1" />
+							<span>{dateFormatter(task.dueDate)}</span>
+						</div>
+					)}
 
-				{task?.subTasks && task.subTasks.length > 0 && (
-					<div className="mt-2 text-xs text-muted-foreground">
-						{task.subTasks.filter((subtask) => subtask.completed).length} /{" "}
-						{task.subTasks.length} subtasks
-					</div>
-				)}
+					{task?.subTasks && task.subTasks.length > 0 && (
+						<div className="mt-2 text-xs text-muted-foreground">
+							{task.subTasks.filter((subtask) => subtask.completed).length} /{" "}
+							{task.subTasks.length} subtasks
+						</div>
+					)}
+				</div>
 			</CardContent>
 		</Card>
 	);

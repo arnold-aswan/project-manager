@@ -47,7 +47,6 @@ const CreateWorkspace = ({
 				navigate(`/workspaces/${data.workspace._id}`);
 			},
 			onError: (error: any) => {
-				console.log("failed creating workspace", error);
 				toast.error("Failed to create workspace.");
 			},
 		});
