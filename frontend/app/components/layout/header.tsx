@@ -31,14 +31,14 @@ const Header = ({
 		const location = window.location;
 
 		if (isOnWorkspacePage) {
-			navigate(`/workspace/${workspace._id}`);
+			navigate(`/workspaces/${workspace._id}`);
 		} else {
 			const basePath = location.pathname;
 			navigate(`${basePath}?workspaceId=${workspace._id}`);
 		}
 	};
 
-	if (!workspaces) return <div>Oops please try again later...</div>;
+	if (!workspaces) return <div>No workspace found!</div>;
 	return (
 		<header className="bg-background sticky top-0 z-40 border-b flex flex-1">
 			<nav className="w-full flex flex-1  h-14 items-center justify-between px-4 sm:px-6 lg:px-8 py-4">
