@@ -40,7 +40,7 @@ const KanbanColumn = ({
 				className={`flex flex-1 ${
 					active ? "overflow-[unset]" : "overflow-auto"
 				} border border-dashed ${
-					isOver ? "border-[#000040]" : "border-transparent"
+					isOver ? " bg-violet-300/30" : "border-transparent"
 				} rounded-sm `}
 			>
 				<div className="flex flex-col gap-4 w-full">{children}</div>

@@ -6,6 +6,7 @@ import KanbanCard from "./KanbanCard";
 import type { Task } from "@/types";
 import { useUpdateTaskStatusMutation } from "@/hooks/useTasks";
 import { useNavigate } from "react-router";
+import { toast } from "sonner";
 
 const Kanban = ({
 	stages,
@@ -53,14 +54,29 @@ const Kanban = ({
 		const { active, over } = event;
 
 		if (!active || !over || active.id === over.id) return;
-
+		if (
+			String(active?.data?.current?.status).toLowerCase().toString() ===
+			String(over?.id)?.toLowerCase()
+		)
+			return;
 		// Get the new status based on the drop zone
 		const newStatus = over.id === "unassigned" ? null : over.id;
 
-		updateTaskStatus({
-			taskId: String(active.id),
-			status: String(newStatus),
-		});
+		updateTaskStatus(
+			{
+				taskId: String(active.id),
+				status: String(newStatus),
+			},
+			{
+				onSuccess: (data: any) => {
+					toast.success(data.message);
+				},
+				onError: (error: any) => {
+					toast.error("Failed to update task status.");
+					console.error(error);
+				},
+			}
+		);
 
 		setTasks((prevTasks) =>
 			prevTasks.map((task) =>
