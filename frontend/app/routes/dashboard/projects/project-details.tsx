@@ -33,7 +33,12 @@ import {
 import { format } from "date-fns";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
-import { Eye } from "@/assets/icons";
+import {
+	Loader as InProgress,
+	Eye,
+	Circle,
+	CheckCircle2,
+} from "@/assets/icons";
 
 const ProjectDetails = () => {
 	const { projectId, workspaceId } = useParams<{
@@ -85,6 +90,39 @@ const ProjectDetails = () => {
 				},
 			}
 		);
+	};
+
+	const taskStatusIcon = (status: string) => {
+		switch (status.toLowerCase()) {
+			case "to do":
+				return (
+					<Circle
+						className="text-white !size-4"
+						size={20}
+					/>
+				);
+			case "in progress":
+				return (
+					<InProgress
+						className="text-white !size-4"
+						size={20}
+					/>
+				);
+			case "done":
+				return (
+					<CheckCircle2
+						className="text-white !size-4"
+						size={20}
+					/>
+				);
+			default:
+				return (
+					<Circle
+						className="text-white !size-4"
+						size={20}
+					/>
+				);
+		}
 	};
 
 	if (isPending) return <Loader />;
@@ -181,85 +219,95 @@ const ProjectDetails = () => {
 						value="table"
 						className="w-full max-w-full"
 					>
-						<div className="w-full max-w-full overflow-x-auto -mx-0">
-							{/* <div className="min-w-[640px] md:min-w-full border"> */}
-							<Table className="min-w-[640px] w-max border-collapse">
-								<TableCaption>A list of tasks.</TableCaption>
-								<TableHeader>
-									<TableRow>
-										<TableHead>Title</TableHead>
-										<TableHead>Status</TableHead>
-										<TableHead>Priority</TableHead>
-										<TableHead>Assignees</TableHead>
-										<TableHead>Sub Tasks</TableHead>
-										<TableHead>Due Date</TableHead>
-										<TableHead>Created At</TableHead>
-										<TableHead>Action</TableHead>
-									</TableRow>
-								</TableHeader>
-								<TableBody>
-									{data?.tasks?.map((task) => (
-										<TableRow key={task._id}>
-											<TableCell>{task.title}</TableCell>
-											<TableCell>
-												<Badge
-													className={cn(
-														taskStatusColor(task.status),
-														"rounded-full"
-													)}
-												>
-													{task.status}
-												</Badge>
-											</TableCell>
-											<TableCell>
-												<Badge
-													className={cn(
-														getTaskPriorityColor(task.priority),
-														"rounded-full"
-													)}
-												>
-													{task.priority}
-												</Badge>
-											</TableCell>
-											<TableCell>
-												{task?.assignees?.slice(0, 3)?.map((a) => (
-													<Avatar
-														key={a._id}
-														className="relative size-8 bg-gray-700 rounded-full border-2 border-background overflow-hidden "
-														title={a.fullname}
-													>
-														<AvatarImage
-															src={a.avatar}
-															alt={"avatar"}
-														/>
-														<AvatarFallback>
-															{a.fullname.charAt(0).toUpperCase()}
-														</AvatarFallback>
-													</Avatar>
-												))}
-											</TableCell>
-											<TableCell>
-												<Badge>{task.subTasks?.length}</Badge>
-											</TableCell>
-											<TableCell>{format(task.dueDate, "P")}</TableCell>
-											<TableCell>{format(task.createdAt, "P")}</TableCell>
-											<TableCell>
-												<Button variant={"outline"}>
-													<Link
-														to={`/workspaces/${workspaceId}/projects/${projectId}/tasks/${task._id}`}
-														className="flex items-center gap-1 "
-													>
-														<Eye />
-														View Task
-													</Link>
-												</Button>
-											</TableCell>
-										</TableRow>
-									))}
-								</TableBody>
-							</Table>
+						<div className="w-full max-w-full overflow-hidden">
+							<div
+								className="overflow-x-auto border rounded-lg"
+								style={{
+									// WebkitOverflowScrolling: "touch",
+									// overscrollBehaviorX: "contain",
+									maxWidth: "calc(100vw - 2rem)",
+								}}
+							>
+								<div className="min-w-[640px]">
+									<Table className="w-full  border-collapse">
+										<TableCaption>Tasks.</TableCaption>
+										<TableHeader>
+											<TableRow>
+												<TableHead>Title</TableHead>
+												<TableHead>Status</TableHead>
+												<TableHead>Priority</TableHead>
+												<TableHead>Assignees</TableHead>
+												<TableHead>Sub Tasks</TableHead>
+												<TableHead>Due Date</TableHead>
+												<TableHead>Created At</TableHead>
+												<TableHead>Action</TableHead>
+											</TableRow>
+										</TableHeader>
+										<TableBody>
+											{data?.tasks?.map((task) => (
+												<TableRow key={task._id}>
+													<TableCell>{task.title}</TableCell>
+													<TableCell>
+														<Badge
+															className={cn(
+																taskStatusColor(task.status),
+																"rounded-full"
+															)}
+														>
+															{taskStatusIcon(task.status)}
+															{task.status}
+														</Badge>
+													</TableCell>
+													<TableCell>
+														<Badge
+															className={cn(
+																getTaskPriorityColor(task.priority),
+																"rounded-full"
+															)}
+														>
+															{task.priority}
+														</Badge>
+													</TableCell>
+													<TableCell>
+														{task?.assignees?.slice(0, 3)?.map((a) => (
+															<Avatar
+																key={a._id}
+																className="relative size-8 bg-gray-700 rounded-full border-2 border-background overflow-hidden "
+																title={a.fullname}
+															>
+																<AvatarImage
+																	src={a.avatar}
+																	alt={"avatar"}
+																/>
+																<AvatarFallback>
+																	{a.fullname.charAt(0).toUpperCase()}
+																</AvatarFallback>
+															</Avatar>
+														))}
+													</TableCell>
+													<TableCell>
+														<Badge>{task.subTasks?.length}</Badge>
+													</TableCell>
+													<TableCell>{format(task.dueDate, "P")}</TableCell>
+													<TableCell>{format(task.createdAt, "P")}</TableCell>
+													<TableCell>
+														<Button variant={"outline"}>
+															<Link
+																to={`/workspaces/${workspaceId}/projects/${projectId}/tasks/${task._id}`}
+																className="flex items-center gap-1 "
+															>
+																<Eye />
+																View Task
+															</Link>
+														</Button>
+													</TableCell>
+												</TableRow>
+											))}
+										</TableBody>
+									</Table>
+								</div>
+							</div>
 						</div>
-						{/* // </div> */}
 					</TabsContent>
 
 					<TabsContent value="kanban">
