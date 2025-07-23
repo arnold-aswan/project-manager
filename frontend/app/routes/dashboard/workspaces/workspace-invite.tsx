@@ -98,7 +98,7 @@ const WorkspaceInvite = () => {
 	}
 
 	return (
-		<section>
+		<section className="flex items-center justify-center h-screen">
 			<Card className="max-w-md w-full">
 				<CardHeader>
 					<div className="flex items-center gap-3 mb-2">
