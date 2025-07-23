@@ -1,22 +1,23 @@
 import dotenv from "dotenv";
-import { Resend } from "resend";
+import sgMail from "@sendgrid/mail";
 
 dotenv.config();
-const resend = new Resend(process.env.RESEND_API_KEY);
 
+sgMail.setApiKey(process.env.SENDGRID_API_KEY as string);
+
+const fromEmail = process.env.SENDER_EMAIL;
 export const sendEmail = async (to: string, subject: string, html: string) => {
-	const { data, error } = await resend.emails.send({
-		from: `TaskHub2 <onboarding@resend.dev>`,
+	const msg = {
 		to,
+		from: `TaskHub <${fromEmail}>`,
 		subject,
 		html,
-	});
-	if (error) {
-		console.log("error sending resend verification email");
-		console.error({ error });
+	};
+	try {
+		await sgMail.send(msg);
+		return true;
+	} catch (error) {
+		console.error(error);
 		return false;
 	}
-
-	console.log({ data });
-	return true;
 };
