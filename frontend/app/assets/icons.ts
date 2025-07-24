@@ -44,4 +44,5 @@ export {
 	Mail,
 	AlertCircle,
 	Boxes,
+	SquaresExclude,
 } from "lucide-react";

@@ -1,4 +1,3 @@
-import React from "react";
 import {
 	Sidebar,
 	SidebarContent,
@@ -18,10 +17,9 @@ import {
 	LogOut,
 	Settings,
 	Users,
-	Wrench,
+	SquaresExclude,
 } from "@/assets/icons";
 import { Button } from "../ui/button";
-import { cn } from "@/lib/utils";
 import useAuthStore from "@/stores/authstore";
 import SidebarNav from "./sidebar-nav";
 import type { Workspace } from "@/types";
@@ -70,8 +68,8 @@ const AppSidebar = ({
 	return (
 		<Sidebar collapsible={"icon"}>
 			<SidebarHeader className="h-14 p-2 flex flex-row items-center justify-center gap-2">
-				<Wrench className="size-6 text-blue-600" />
-				{open && <span className="font-semibold text-lg">TaskHub</span>}
+				<SquaresExclude className="size-6 text-blue-600" />
+				{open && <span className="font-semibold text-lg">Spaces</span>}
 			</SidebarHeader>
 			<SidebarSeparator />
 			<SidebarContent>
