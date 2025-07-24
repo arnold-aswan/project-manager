@@ -16,7 +16,7 @@ type InviteMemberParams = {
 
 type InviteMemberBody = {
 	email: string;
-	role: "manager" | "contributor" | "viewer";
+	role: "admin" | "member" | "viewer";
 };
 
 export interface UserWithId {
