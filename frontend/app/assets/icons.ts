@@ -1,5 +1,6 @@
 export {
 	ArrowLeft,
+	ArrowRight,
 	CheckCircle,
 	XCircle,
 	Circle,
@@ -45,4 +46,8 @@ export {
 	AlertCircle,
 	Boxes,
 	SquaresExclude,
+	Ungroup,
+	Play,
+	Kanban,
+	Layers,
 } from "lucide-react";

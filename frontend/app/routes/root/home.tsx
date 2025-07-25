@@ -1,30 +1,32 @@
-import React from "react";
 import type { Route } from "./+types/home";
-import { Button } from "@/components/ui/button";
-import { Link } from "react-router";
+import Header from "@/components/home/Header";
+import Hero from "@/components/home/Hero";
+import Features from "@/components/home/Features";
+import AppPreview from "@/components/home/AppPreview";
+import CallToAction from "@/components/home/CallToAction";
+import Footer from "@/components/home/Footer";
 
 export function meta({}: Route.MetaArgs) {
 	return [
-		{ title: "TaskHub" },
-		{ name: "description", content: "Welcome to TaskHub!" },
+		{ title: "Spaces" },
+		{
+			name: "description",
+			content:
+				"Welcome to Spaces. A project manager platform for teams and individuals.",
+		},
 	];
 }
 
 const Home = () => {
 	return (
-		<section className="w-full h-screen flex items-center justify-center gap-4">
-			<Link to="/sign-in">
-				<Button className="bg-blue-500 text-white">Login</Button>
-			</Link>
-
-			<Link to="/sign-in">
-				<Button
-					variant={"outline"}
-					className="bg-blue-500 text-white"
-				>
-					Sign Up
-				</Button>
-			</Link>
+		<section className="w-full min-h-screen bg-background ">
+			<Header />
+			<Hero />
+			<Features />
+			<AppPreview />
+			{/* <Testimonials /> */}
+			<CallToAction />
+			<Footer />
 		</section>
 	);
 };
