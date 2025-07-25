@@ -25,13 +25,27 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 // MongoDB connection
-mongoose
-	.connect(process.env.MONGODB_URI as string)
-	.then(() => console.log("MongoDB connected successfully"))
-	.catch((err) => console.error("MongoDB connection failed::", err));
+// Enhanced MongoDB connection with timeout and detailed logging
+const connectDB = async () => {
+	try {
+		const conn = await mongoose.connect(process.env.MONGODB_URI as string, {
+			serverSelectionTimeoutMS: 10000,
+			socketTimeoutMS: 45000,
+			bufferCommands: false,
+		});
+
+		console.log(`MongoDB Connected: ${conn.connection.host}`);
+		console.log(`Database: ${conn.connection.name}`);
+	} catch (error: any) {
+		console.error("MongoDB connection failed:", error.message);
+		process.exit(1);
+	}
+};
+
+connectDB();
 
 app.get("/", async (req, res) => {
-	res.status(200).json({ message: "Welcome to the taskhub backend!" });
+	res.status(200).json({ message: "Welcome to the Spaces backend!" });
 });
 
 // ROUTES
