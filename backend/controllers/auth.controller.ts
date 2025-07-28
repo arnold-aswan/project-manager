@@ -6,6 +6,9 @@ import User from "../models/user";
 import Verification from "../models/verification";
 import aj from "../libs/arcjet";
 import { sendEmail } from "../libs/send-email";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 const jwtSecret = process.env.JWT_SECRET;
 if (!jwtSecret) {
@@ -184,8 +187,9 @@ const loginUser = async (req: Request, res: Response) => {
 
 		// Set the token in http-only cookie
 		res.cookie("token", token, {
+			secure: process.env.NODE_ENV === "production",
 			httpOnly: true,
-			sameSite: "strict",
+			sameSite: "none",
 			maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
 		});
 
