@@ -173,7 +173,10 @@ const getWorkspaceStats = async (req: Request, res: Response) => {
 		const [totalProjects, projects] = await Promise.all([
 			Project.countDocuments({ workspace: workspaceId }),
 			Project.find({ workspace: workspaceId })
-				.populate("tasks", "title status dueDate project isArchived priority")
+				.populate(
+					"tasks",
+					"title status dueDate project isArchived priority createdAt updatedAt"
+				)
 				.sort({ createdAt: -1 }),
 		]);
 
@@ -202,7 +205,6 @@ const getWorkspaceStats = async (req: Request, res: Response) => {
 		});
 
 		// get upcoming task in next 7 days
-
 		const upcomingTasks = tasks.filter((task: any) => {
 			const taskDate = new Date(task.dueDate);
 			const today = new Date();
@@ -212,60 +214,55 @@ const getWorkspaceStats = async (req: Request, res: Response) => {
 			);
 		});
 
-		const taskTrendsData = [
-			{ name: "Sun", completed: 0, inProgress: 0, toDo: 0 },
-			{ name: "Mon", completed: 0, inProgress: 0, toDo: 0 },
-			{ name: "Tue", completed: 0, inProgress: 0, toDo: 0 },
-			{ name: "Wed", completed: 0, inProgress: 0, toDo: 0 },
-			{ name: "Thu", completed: 0, inProgress: 0, toDo: 0 },
-			{ name: "Fri", completed: 0, inProgress: 0, toDo: 0 },
-			{ name: "Sat", completed: 0, inProgress: 0, toDo: 0 },
-		];
-
-		// get last 7 days tasks date
+		// Create last 7 days array with consistent day names
 		const last7Days = Array.from({ length: 7 }, (_, i) => {
 			const date = new Date();
 			date.setDate(date.getDate() - i);
 			return date;
 		}).reverse();
 
-		// populate
+		// Initialize taskTrendsData with actual day names from last7Days
+		const taskTrendsData = last7Days.map((date) => ({
+			name: date.toLocaleDateString("en-US", { weekday: "short" }),
+			completed: 0,
+			inProgress: 0,
+			toDo: 0,
+		}));
 
+		// Populate task trends data
 		for (const project of projects) {
 			for (const task of project.tasks as any[]) {
-				const taskDate = new Date(task.updatedAt);
+				// Use createdAt or updatedAt - choose based on your needs
+				const taskDate = new Date(task.updatedAt); // or task.createdAt
 
-				const dayInDate = last7Days.findIndex(
-					(date) =>
+				const dayIndex = last7Days.findIndex((date) => {
+					const isSameDay =
 						date.getDate() === taskDate.getDate() &&
 						date.getMonth() === taskDate.getMonth() &&
-						date.getFullYear() === taskDate.getFullYear()
-				);
+						date.getFullYear() === taskDate.getFullYear();
 
-				if (dayInDate !== -1) {
-					const dayName = last7Days[dayInDate].toLocaleDateString("en-US", {
-						weekday: "short",
-					});
+					return isSameDay;
+				});
 
-					const dayData = taskTrendsData.find((day) => day.name === dayName);
+				if (dayIndex !== -1) {
+					const status = task.status?.toLowerCase();
 
-					if (dayData) {
-						switch (task.status) {
-							case "Done":
-								dayData.completed++;
-								break;
-							case "In Progress":
-								dayData.inProgress++;
-								break;
-							case "To Do":
-								dayData.toDo++;
-								break;
-						}
+					switch (status) {
+						case "done":
+							taskTrendsData[dayIndex].completed++;
+							break;
+						case "in progress":
+							taskTrendsData[dayIndex].inProgress++;
+							break;
+						case "to do":
+							taskTrendsData[dayIndex].toDo++;
+							break;
+						default:
+							console.log(`Unknown status: ${task.status}`);
 					}
 				}
 			}
 		}
-
 		// get project status distribution
 		const projectStatusData = [
 			{ name: "Completed", value: 0, color: "#10b981" },
@@ -295,7 +292,7 @@ const getWorkspaceStats = async (req: Request, res: Response) => {
 		];
 
 		for (const task of tasks) {
-			switch (task.priority.toLowerCase()) {
+			switch (task.priority?.toLowerCase()) {
 				case "high":
 					taskPriorityData[0].value++;
 					break;
@@ -316,7 +313,8 @@ const getWorkspaceStats = async (req: Request, res: Response) => {
 			);
 
 			const completedTask = projectTask.filter(
-				(task: any) => task.status === "Done" && task.isArchived === false
+				(task: any) =>
+					task.status?.toLowerCase() === "done" && task.isArchived === false
 			);
 
 			workspaceProductivityData.push({
