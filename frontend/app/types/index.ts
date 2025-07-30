@@ -244,10 +244,10 @@ export interface Comment {
 export interface StatsCardProps {
 	totalProjects: number;
 	totalTasks: number;
-	totalProjectInProgress: number;
+	totalProjectsInProgress: number;
 	totalTaskCompleted: number;
-	totalTaskToDo: number;
-	totalTaskInProgress: number;
+	totalTasksToDo: number;
+	totalTasksInProgress: number;
 }
 
 export interface TaskTrendsData {

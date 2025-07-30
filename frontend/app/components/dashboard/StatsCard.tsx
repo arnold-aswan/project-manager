@@ -11,7 +11,7 @@ const StatsCard = ({ stats }: { stats: StatsCardProps }) => {
 				<CardContent>
 					<p className="text-2xl font-bold">{stats.totalProjects}</p>
 					<p className="text-xs text-muted-foreground">
-						{stats.totalProjectInProgress || 0} in progress
+						{stats.totalProjectsInProgress} in progress
 					</p>
 				</CardContent>
 			</Card>
@@ -32,7 +32,7 @@ const StatsCard = ({ stats }: { stats: StatsCardProps }) => {
 					<CardTitle className="text-sm font-medium">To Do</CardTitle>
 				</CardHeader>
 				<CardContent>
-					<p className="text-2xl font-bold">{stats.totalTaskToDo || 0}</p>
+					<p className="text-2xl font-bold">{stats.totalTasksToDo || 0}</p>
 					<p className="text-xs text-muted-foreground">
 						Tasks waiting to be done
 					</p>
@@ -43,7 +43,9 @@ const StatsCard = ({ stats }: { stats: StatsCardProps }) => {
 					<CardTitle className="text-sm font-medium">In Progress</CardTitle>
 				</CardHeader>
 				<CardContent>
-					<p className="text-2xl font-bold">{stats.totalTaskInProgress || 0}</p>
+					<p className="text-2xl font-bold">
+						{stats.totalTasksInProgress || 0}
+					</p>
 					<p className="text-xs text-muted-foreground">
 						Tasks currently in progress
 					</p>

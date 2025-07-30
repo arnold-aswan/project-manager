@@ -49,7 +49,7 @@ const StatsCharts = ({
 	workspaceProductivityData,
 }: StatsChartProps) => {
 	return (
-		<div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:gc3 mb-8">
+		<div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 mb-8">
 			<Card className="lg:col-span-2">
 				<CardHeader className="flex flex-row items-center justify-between pb-2">
 					<div className="space-y-0.5">
